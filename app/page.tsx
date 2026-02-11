@@ -1,48 +1,55 @@
-import Link from "next/link";
+import DirectoryFilters from "@/components/DirectoryFilters";
 import { listPrograms } from "@/lib/notion";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { q?: string; category?: string; stage?: string };
+}) {
   const programs = await listPrograms();
 
-  // lightweight sort: provider then name
-  programs.sort((a, b) => (a.provider || "").localeCompare(b.provider || "") || a.name.localeCompare(b.name));
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Credits & perks directory</h1>
-        <p className="opacity-80">
-          A living list of startup credits, perks, and Iowa ecosystem programs. Use <a className="underline" href="/submit">Suggest</a> to add or update.
+    <div className="space-y-8">
+      <section className="rounded-xl border p-6 space-y-3">
+        <h1 className="text-2xl font-semibold">Iowa Startups Source</h1>
+        <p className="opacity-80 max-w-3xl">
+          A living directory of credits, perks, accelerators, and non-dilutive programs to extend runway for Iowa founders.
+          Built by Ikwe.ai - ecosystem infrastructure, not a pitch deck.
         </p>
-      </div>
 
-      <div className="grid gap-3">
-        {programs.map((p) => (
-          <Link
-            key={p.id}
-            href={`/program/${p.id}`}
-            className="block rounded-lg border p-4 hover:bg-zinc-50"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="font-medium">{p.name || "Untitled Program"}</div>
-                <div className="text-sm opacity-80">{p.provider}</div>
-                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  {(p.category || []).slice(0, 4).map((c) => (
-                    <span key={c} className="rounded-full border px-2 py-1">{c}</span>
-                  ))}
-                  {p.requiresReferral && <span className="rounded-full border px-2 py-1">Referral</span>}
-                  {p.geo && <span className="rounded-full border px-2 py-1">{p.geo}</span>}
-                  {p.needsReview && <span className="rounded-full border px-2 py-1">Needs review</span>}
-                </div>
-              </div>
-              <div className="text-sm opacity-80 text-right">
-                {typeof p.valueUsdEst === "number" ? `$${p.valueUsdEst.toLocaleString()}` : ""}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+        <div className="grid gap-2 md:grid-cols-3 pt-2">
+          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?category=LLM%2FAPI%20Credits">
+            <div className="font-medium">AI Credits Stack</div>
+            <div className="text-sm opacity-80">LLM/API credits to apply for this week</div>
+          </a>
+
+          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?category=Cloud%20Credits">
+            <div className="font-medium">Cloud Runway Stack</div>
+            <div className="text-sm opacity-80">Cloud credits + startup infra perks</div>
+          </a>
+
+          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?q=VentureNet">
+            <div className="font-medium">Iowa Non-Dilutive Stack</div>
+            <div className="text-sm opacity-80">VentureNet + state ecosystem resources</div>
+          </a>
+        </div>
+
+        <div className="text-sm pt-2">
+          <a className="underline" href="/submit">Suggest a program</a>
+          <span className="opacity-60"> - </span>
+          <a className="underline" href="/about">How this works</a>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Directory</h2>
+        <DirectoryFilters
+          programs={programs as any}
+          initialQuery={searchParams?.q || ""}
+          initialCategory={searchParams?.category || ""}
+          initialStage={searchParams?.stage || ""}
+        />
+      </section>
     </div>
   );
 }

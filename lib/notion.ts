@@ -75,7 +75,18 @@ export async function listPrograms(): Promise<Program[]> {
   const resp = await notion.databases.query({
     database_id: dbId,
     page_size: 200,
-    // You can add Notion-side filters later (e.g. Status = Active)
+    filter: {
+      and: [
+        {
+          property: "Status",
+          select: { equals: "Active" },
+        },
+        {
+          property: "Needs Review",
+          checkbox: { equals: false },
+        },
+      ],
+    },
   });
 
   return resp.results.map((page: any) => {
