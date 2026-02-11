@@ -1,0 +1,32 @@
+name: Verify Program Links (Notion)
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  verify-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify links and update Notion
+        run: npm run audit:links
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PROGRAMS_DB_ID: ${{ secrets.NOTION_PROGRAMS_DB_ID }}
+          LINK_AUDIT_DRY_RUN: "false"
+          LINK_AUDIT_ACTIVE_VALUE: "Active"
+          LINK_AUDIT_SET_STATUS_ON_BROKEN: "false"
+          LINK_AUDIT_BROKEN_STATUS_VALUE: "Needs Review"
