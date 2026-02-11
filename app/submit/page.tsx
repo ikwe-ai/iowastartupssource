@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
 const SUGGESTION_TYPES = ["New Program", "Update Existing", "Broken Link", "Other"] as const;
@@ -8,6 +8,14 @@ const SUGGESTION_TYPES = ["New Program", "Update Existing", "Broken Link", "Othe
 type SuggestionType = (typeof SUGGESTION_TYPES)[number];
 
 export default function SubmitPage() {
+  return (
+    <Suspense fallback={<div className="max-w-3xl text-sm text-zinc-500">Loading submit form...</div>}>
+      <SubmitPageForm />
+    </Suspense>
+  );
+}
+
+function SubmitPageForm() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState<{ ok: boolean; msg: string } | null>(null);
