@@ -26,7 +26,7 @@ export default function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <nav className="hidden items-center gap-1 sm:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => {
               const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
@@ -45,10 +45,10 @@ export default function SiteHeader() {
 
           <Link
             href="/submit"
-            className="rounded-full bg-zinc-900 px-3 py-2 text-xs text-white shadow-sm hover:bg-zinc-800 sm:px-4 sm:text-sm"
+            className="shrink-0 rounded-full bg-zinc-900 px-3 py-2 text-xs text-white shadow-sm hover:bg-zinc-800 sm:px-4 sm:text-sm"
           >
-            <span className="sm:hidden">Add</span>
-            <span className="hidden sm:inline">Add a program</span>
+            <span className="lg:hidden">Add</span>
+            <span className="hidden lg:inline">Add a program</span>
           </Link>
 
           <button
