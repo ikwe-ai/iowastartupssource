@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "crawl": "node scripts/checkSources.mjs",
-    "audit:links": "node scripts/linkAudit.mjs"
+    "audit:links": "node scripts/linkAudit.mjs",
+    "schema:suggestions": "node scripts/print-suggestions-schema.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",

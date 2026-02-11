@@ -64,3 +64,10 @@ Optional env vars:
 - `LINK_AUDIT_URL_PROP="Application Link"` to override canonical URL property
 - `LINK_AUDIT_SET_STATUS_ON_BROKEN=true` to set status when a link fails
 - `LINK_AUDIT_BROKEN_STATUS_VALUE="Needs Review"` status value to write on broken links
+
+## Suggestions schema helper
+Print Suggestions DB property names/types to map form fields exactly:
+
+```bash
+npm run schema:suggestions
+```
