@@ -1,0 +1,36 @@
+name: Discover Suggestions (News + Companies)
+
+on:
+  schedule:
+    - cron: "10 8 * * 1,3,5"
+  workflow_dispatch:
+
+jobs:
+  discover-suggestions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Discover new startup resources into Pending suggestions
+        run: npm run auto:discover-suggestions
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SUGGESTIONS_DB_ID: ${{ secrets.NOTION_SUGGESTIONS_DB_ID }}
+          NOTION_PROGRAMS_DB_ID: ${{ secrets.NOTION_PROGRAMS_DB_ID }}
+          DISCOVERY_DRY_RUN: "false"
+          DISCOVERY_MAX_ITEMS: "25"
+          DISCOVERY_LOOKBACK_DAYS: "45"
+          DISCOVERY_MIN_SCORE: "2"
+          DISCOVERY_STATUS: "Pending"
+          DISCOVERY_SOURCES_FILE: "data/discovery-sources.json"
+          DISCOVERY_SUBMITTER_EMAIL: ${{ secrets.AUTO_ADD_SUBMITTER_EMAIL }}

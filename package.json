@@ -12,6 +12,7 @@
     "audit:links": "node scripts/linkAudit.mjs",
     "audit:fill-priority": "node scripts/fillPriorityReport.mjs",
     "auto:add-suggestions": "node scripts/autoAddSuggestions.mjs",
+    "auto:discover-suggestions": "node scripts/discoverResources.mjs",
     "auto:check-pending": "node scripts/checkPendingSuggestions.mjs",
     "enrich:programs": "node scripts/enrichPrograms.mjs",
     "schema:suggestions": "node scripts/print-suggestions-schema.mjs",

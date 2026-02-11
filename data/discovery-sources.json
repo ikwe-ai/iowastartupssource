@@ -1,0 +1,58 @@
+[
+  {
+    "name": "AWS Startups Blog",
+    "kind": "rss",
+    "url": "https://aws.amazon.com/blogs/startups/feed/",
+    "providerHint": "AWS",
+    "category": ["Cloud Credits"],
+    "stage": ["MVP", "Revenue"]
+  },
+  {
+    "name": "Google Cloud Blog (Startup)",
+    "kind": "rss",
+    "url": "https://cloud.google.com/blog/topics/startups/rss/",
+    "providerHint": "Google Cloud",
+    "category": ["Cloud Credits", "LLM/API Credits"],
+    "stage": ["MVP", "Revenue"]
+  },
+  {
+    "name": "Microsoft for Startups Blog",
+    "kind": "rss",
+    "url": "https://startups.microsoft.com/blog/rss/",
+    "providerHint": "Microsoft",
+    "category": ["Cloud Credits", "LLM/API Credits"],
+    "stage": ["MVP", "Revenue"]
+  },
+  {
+    "name": "NVIDIA Inception Blog",
+    "kind": "rss",
+    "url": "https://blogs.nvidia.com/blog/category/startups/feed/",
+    "providerHint": "NVIDIA",
+    "category": ["AI Programs", "LLM/API Credits"],
+    "stage": ["MVP", "Revenue"]
+  },
+  {
+    "name": "State of Iowa - Economic Development",
+    "kind": "rss",
+    "url": "https://iowaeda.com/feed/",
+    "providerHint": "State of Iowa",
+    "category": ["Non-Dilutive Funding", "Iowa Programs"],
+    "stage": ["Idea", "MVP", "Revenue"]
+  },
+  {
+    "name": "VentureNet Iowa News",
+    "kind": "html",
+    "url": "https://www.venturenetiowa.com/resources",
+    "providerHint": "VentureNet Iowa",
+    "category": ["Iowa Programs", "Community"],
+    "stage": ["Idea", "MVP", "Revenue"]
+  },
+  {
+    "name": "ISU Pappajohn Center",
+    "kind": "html",
+    "url": "https://www.isupjcenter.org/",
+    "providerHint": "ISU Entrepreneurship",
+    "category": ["Iowa Programs", "Student Programs"],
+    "stage": ["Idea", "MVP"]
+  }
+]
