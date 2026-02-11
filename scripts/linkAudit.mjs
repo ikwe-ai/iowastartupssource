@@ -5,8 +5,9 @@ const databaseId = process.env.NOTION_PROGRAMS_DB_ID;
 
 const dryRun = String(process.env.LINK_AUDIT_DRY_RUN ?? "false").toLowerCase() === "true";
 const activeStatusValue = process.env.LINK_AUDIT_ACTIVE_VALUE ?? "Active";
-const setStatusOnBroken = String(process.env.LINK_AUDIT_SET_STATUS_ON_BROKEN ?? "false").toLowerCase() === "true";
+const setStatusOnBroken = String(process.env.LINK_AUDIT_SET_STATUS_ON_BROKEN ?? "true").toLowerCase() === "true";
 const brokenStatusValue = process.env.LINK_AUDIT_BROKEN_STATUS_VALUE ?? "Needs Review";
+const flagRedirectForReview = String(process.env.LINK_AUDIT_FLAG_REDIRECT_REVIEW ?? "true").toLowerCase() === "true";
 
 if (!process.env.NOTION_TOKEN) {
   throw new Error("Missing env var: NOTION_TOKEN");
@@ -41,7 +42,7 @@ function getUrlFromProperty(prop) {
 async function checkUrl(url) {
   try {
     let res = await fetch(url, { method: "HEAD", redirect: "follow" });
-    if (res.status === 405 || res.status === 501) {
+    if (res.status === 403 || res.status === 405 || res.status === 501) {
       res = await fetch(url, { method: "GET", redirect: "follow" });
     }
 
@@ -251,6 +252,9 @@ async function main() {
     }
 
     if (!result.ok && reviewProp) {
+      updateProps[reviewProp.name] = { checkbox: true };
+    }
+    if (result.linkStatus === "Redirect" && flagRedirectForReview && reviewProp) {
       updateProps[reviewProp.name] = { checkbox: true };
     }
 

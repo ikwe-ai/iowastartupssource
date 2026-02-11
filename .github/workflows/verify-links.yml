@@ -28,5 +28,6 @@ jobs:
           NOTION_PROGRAMS_DB_ID: ${{ secrets.NOTION_PROGRAMS_DB_ID }}
           LINK_AUDIT_DRY_RUN: "false"
           LINK_AUDIT_ACTIVE_VALUE: "Active"
-          LINK_AUDIT_SET_STATUS_ON_BROKEN: "false"
+          LINK_AUDIT_SET_STATUS_ON_BROKEN: "true"
           LINK_AUDIT_BROKEN_STATUS_VALUE: "Needs Review"
+          LINK_AUDIT_FLAG_REDIRECT_REVIEW: "true"
