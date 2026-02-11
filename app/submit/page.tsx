@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 
 const SUGGESTION_TYPES = ["New Program", "Update Existing", "Broken Link", "Other"] as const;
 
 type SuggestionType = (typeof SUGGESTION_TYPES)[number];
 
 export default function SubmitPage() {
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState<{ ok: boolean; msg: string } | null>(null);
 
@@ -25,6 +27,19 @@ export default function SubmitPage() {
 
   const categoryArr = useMemo(() => category.split(",").map((s) => s.trim()).filter(Boolean), [category]);
   const stageArr = useMemo(() => stage.split(",").map((s) => s.trim()).filter(Boolean), [stage]);
+
+  useEffect(() => {
+    const titleQ = searchParams.get("title");
+    const suggestionTypeQ = searchParams.get("suggestionType");
+    const relatedProgramIdQ = searchParams.get("relatedProgramId");
+    const programUrlQ = searchParams.get("programUrl");
+    if (titleQ && !title) setTitle(titleQ);
+    if (programUrlQ && !programUrl) setProgramUrl(programUrlQ);
+    if (relatedProgramIdQ && !relatedProgramId) setRelatedProgramId(relatedProgramIdQ);
+    if (suggestionTypeQ && suggestionType === "New Program" && SUGGESTION_TYPES.includes(suggestionTypeQ as SuggestionType)) {
+      setSuggestionType(suggestionTypeQ as SuggestionType);
+    }
+  }, [searchParams, title, programUrl, relatedProgramId, suggestionType]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -48,6 +63,7 @@ export default function SubmitPage() {
           relatedProgramId,
           evidenceUrl,
           submitterEmail,
+          programId: relatedProgramId,
         }),
       });
 

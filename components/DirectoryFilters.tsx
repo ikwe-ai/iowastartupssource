@@ -31,6 +31,7 @@ export default function DirectoryFilters({
   const [stage, setStage] = useState(initialStage);
   const [onlyIowa, setOnlyIowa] = useState(false);
   const [sort, setSort] = useState<"provider" | "value">("provider");
+  const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : ""].filter(Boolean).length;
 
   const categories = useMemo(() => {
     const s = new Set<string>();
@@ -137,32 +138,56 @@ export default function DirectoryFilters({
 
       <div className="text-sm opacity-80">
         Showing <span className="font-medium">{filtered.length}</span> programs
+        {activeFilterCount > 0 && (
+          <span className="ml-2 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+            {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
+          </span>
+        )}
       </div>
 
-      <div className="grid gap-3">
-        {filtered.map((p) => (
-          <Link key={p.id} href={`/program/${p.id}`} className="block rounded-3xl border bg-white/80 backdrop-blur p-5 shadow-sm hover:bg-white">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="font-medium">{p.name || "Untitled Program"}</div>
-                <div className="text-sm opacity-80">{p.provider}</div>
+      {filtered.length === 0 ? (
+        <div className="rounded-3xl border bg-white/80 p-8 text-center shadow-sm backdrop-blur">
+          <div className="text-lg font-medium">No programs match these filters.</div>
+          <p className="mt-2 text-sm text-zinc-600">Try broadening your search or reset filters to see all approved entries.</p>
+          <button
+            className="mt-4 rounded-full border bg-white px-4 py-2 text-sm hover:bg-zinc-50"
+            onClick={() => {
+              setQ("");
+              setCategory("");
+              setStage("");
+              setOnlyIowa(false);
+              setSort("provider");
+            }}
+          >
+            Reset all filters
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-3">
+          {filtered.map((p) => (
+            <Link key={p.id} href={`/program/${p.id}`} className="block rounded-3xl border bg-white/80 backdrop-blur p-5 shadow-sm hover:bg-white">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="font-medium">{p.name || "Untitled Program"}</div>
+                  <div className="text-sm opacity-80">{p.provider}</div>
 
-                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  {(p.category || []).slice(0, 4).map((c) => (
-                    <span key={c} className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700">{c}</span>
-                  ))}
-                  {p.requiresReferral && <span className="rounded-full border px-2 py-1">Referral</span>}
-                  {p.geo && <span className="rounded-full border px-2 py-1">{p.geo}</span>}
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    {(p.category || []).slice(0, 4).map((c) => (
+                      <span key={c} className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700">{c}</span>
+                    ))}
+                    {p.requiresReferral && <span className="rounded-full border px-2 py-1">Referral</span>}
+                    {p.geo && <span className="rounded-full border px-2 py-1">{p.geo}</span>}
+                  </div>
+                </div>
+
+                <div className="text-sm opacity-80 text-right">
+                  {typeof p.valueUsdEst === "number" ? `$${p.valueUsdEst.toLocaleString()}` : ""}
                 </div>
               </div>
-
-              <div className="text-sm opacity-80 text-right">
-                {typeof p.valueUsdEst === "number" ? `$${p.valueUsdEst.toLocaleString()}` : ""}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
