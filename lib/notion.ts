@@ -301,7 +301,7 @@ export async function getProgram(programId: string): Promise<Program | null> {
   }
 }
 
-export async function createSuggestion(input: SuggestionInput): Promise<void> {
+export async function createSuggestion(input: SuggestionInput): Promise<string> {
   const notion = notionClient();
   const dbId = reqEnv("NOTION_SUGGESTIONS_DB_ID", NOTION_SUGGESTIONS_DB_ID);
   const dbSchema: any = await notion.databases.retrieve({ database_id: dbId });
@@ -339,8 +339,9 @@ export async function createSuggestion(input: SuggestionInput): Promise<void> {
     }
   }
 
-  await notion.pages.create({
+  const page: any = await notion.pages.create({
     parent: { database_id: dbId },
     properties: props,
   });
+  return page.id;
 }
