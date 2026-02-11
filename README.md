@@ -51,3 +51,16 @@ Create a Notion DB called “Iowa Startups Source — Suggestions” with:
 - v3: Publish “Iowa Credits Pack” + curated stacks for AI/health/insurance/edtech
 
 Built by Ikwe.ai
+
+## Link audit (Notion)
+Run a link verification pass against approved programs and optionally write results back to Notion.
+
+```bash
+npm run audit:links
+```
+
+Optional env vars:
+- `LINK_AUDIT_DRY_RUN=true` to preview without writes
+- `LINK_AUDIT_URL_PROP="Application Link"` to override canonical URL property
+- `LINK_AUDIT_SET_STATUS_ON_BROKEN=true` to set status when a link fails
+- `LINK_AUDIT_BROKEN_STATUS_VALUE="Needs Review"` status value to write on broken links

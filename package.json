@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "crawl": "node scripts/checkSources.mjs"
+    "crawl": "node scripts/checkSources.mjs",
+    "audit:links": "node scripts/linkAudit.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
