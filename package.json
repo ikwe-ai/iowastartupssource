@@ -10,6 +10,7 @@
     "lint": "next lint",
     "crawl": "node scripts/checkSources.mjs",
     "audit:links": "node scripts/linkAudit.mjs",
+    "enrich:programs": "node scripts/enrichPrograms.mjs",
     "schema:suggestions": "node scripts/print-suggestions-schema.mjs",
     "gap:perks": "node scripts/perksGapReport.mjs"
   },

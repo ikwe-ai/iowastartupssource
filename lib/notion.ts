@@ -9,6 +9,7 @@ export type Program = {
   name: string;
   provider: string;
   category: string[];
+  whatYouGet?: string;
   offerType?: string;
   valueUsdEst?: number;
   eligibilitySummary?: string;
@@ -216,6 +217,7 @@ export async function listPrograms(): Promise<Program[]> {
       name,
       provider,
       category,
+      whatYouGet: textFromRich(props["What you get"]) ?? textFromRich(props["Offer Summary"]) ?? textFromRich(props["Offer"]),
       offerType: selectName(props["Offer Type"]) ?? textFromRich(props["Offer Type"]),
       valueUsdEst: number(props["Value (USD est.)"]) ?? number(props["Value"]),
       eligibilitySummary: textFromRich(props["Eligibility Summary"]) ?? textFromRich(props["Eligibility"]),
@@ -247,6 +249,7 @@ export async function getProgram(programId: string): Promise<Program | null> {
       name,
       provider,
       category,
+      whatYouGet: textFromRich(props["What you get"]) ?? textFromRich(props["Offer Summary"]) ?? textFromRich(props["Offer"]),
       offerType: selectName(props["Offer Type"]) ?? textFromRich(props["Offer Type"]),
       valueUsdEst: number(props["Value (USD est.)"]) ?? number(props["Value"]),
       eligibilitySummary: textFromRich(props["Eligibility Summary"]) ?? textFromRich(props["Eligibility"]),

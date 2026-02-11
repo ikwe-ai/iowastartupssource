@@ -27,6 +27,13 @@ export default async function ProgramDetail({ params }: { params: { id: string }
         {p.needsReview && <span className="rounded-full border px-2 py-1">Needs review</span>}
       </div>
 
+      {p.whatYouGet && (
+        <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
+          <div className="font-medium mb-1">What you get</div>
+          <div className="opacity-90">{p.whatYouGet}</div>
+        </div>
+      )}
+
       {p.eligibilitySummary && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
           <div className="font-medium mb-1">Eligibility</div>
