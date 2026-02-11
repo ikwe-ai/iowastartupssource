@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+body { @apply bg-white text-zinc-900; }
+a { @apply text-zinc-900; }
+
+@layer components {
+  .card {
+    @apply rounded-3xl border border-zinc-200 bg-white shadow-sm;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50;
+  }
+  .btn-primary {
+    @apply border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent shadow-none hover:bg-zinc-50;
+  }
+}

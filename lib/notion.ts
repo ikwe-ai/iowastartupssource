@@ -53,6 +53,15 @@ export type SuggestionInput = {
 
 export type SuggestionType = "New Program" | "Update Existing" | "Broken Link" | "Other";
 
+export function normalizeSuggestionType(value: unknown): SuggestionType {
+  const raw = String(value || "").trim();
+  if (raw === "New Program") return "New Program";
+  if (raw === "Update Existing") return "Update Existing";
+  if (raw === "Broken Link") return "Broken Link";
+  if (raw === "Other") return "Other";
+  return "Other";
+}
+
 function reqEnv(name: string, v: string | undefined): string {
   if (!v) throw new Error(`Missing env var: ${name}`);
   return v;

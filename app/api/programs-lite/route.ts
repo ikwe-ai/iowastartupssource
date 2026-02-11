@@ -31,6 +31,8 @@ export async function GET() {
         "";
 
       const url =
+        r.properties?.["Apply URL"]?.url ||
+        r.properties?.["Application Link"]?.url ||
         r.properties?.URL?.url ||
         r.properties?.Link?.url ||
         r.properties?.["Program URL"]?.url ||

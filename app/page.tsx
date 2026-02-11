@@ -1,6 +1,8 @@
 import DirectoryFilters from "@/components/DirectoryFilters";
 import { listPrograms, type Program } from "@/lib/notion";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home({
   searchParams,
 }: {
@@ -80,6 +82,12 @@ export default async function Home({
           <h2 className="text-xl font-semibold">Directory</h2>
           <div className="flex items-center gap-2">
             <div className="text-sm text-zinc-500">{programs.length} approved entries</div>
+            <a
+              href="/api/export/verified.csv"
+              className="rounded-full border bg-white px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50"
+            >
+              Download CSV
+            </a>
             <a
               href="/admin/fill-priority"
               className="rounded-full border bg-white px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50"

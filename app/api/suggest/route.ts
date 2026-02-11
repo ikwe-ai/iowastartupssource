@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSuggestion, type SuggestionType } from "@/lib/notion";
-
-const ALLOWED_TYPES: SuggestionType[] = ["New Program", "Update Existing", "Broken Link", "Other"];
+import { createSuggestion, normalizeSuggestionType } from "@/lib/notion";
 
 export async function POST(req: Request) {
   try {
@@ -12,8 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Missing title" }, { status: 400 });
     }
 
-    const suggestionType = String(body.suggestionType || "New Program").trim() as SuggestionType;
-    const safeType: SuggestionType = ALLOWED_TYPES.includes(suggestionType) ? suggestionType : "Other";
+    const safeType = normalizeSuggestionType(body.suggestionType);
 
     const id = await createSuggestion({
       title,

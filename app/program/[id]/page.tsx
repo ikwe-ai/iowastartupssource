@@ -2,6 +2,8 @@ import { getProgram } from "@/lib/notion";
 import ProgramActionPanel from "@/components/ProgramActionPanel";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 function toBullets(text?: string): string[] {
   if (!text) return [];
   const normalized = text
