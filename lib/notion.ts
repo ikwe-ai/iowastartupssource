@@ -26,7 +26,7 @@ export type Program = {
 
 export type SuggestionInput = {
   title: string;
-  suggestionType: string;
+  suggestionType: SuggestionType;
   relatedProgramId?: string;
   programUrl?: string;
   provider?: string;
@@ -35,10 +35,13 @@ export type SuggestionInput = {
   whatYouGet?: string;
   eligibility?: string;
   proposedChange?: string;
+  programId?: string;
   submitterEmail?: string;
   evidenceUrl?: string;
   notes?: string;
 };
+
+export type SuggestionType = "New Program" | "Update Existing" | "Broken Link" | "Other";
 
 function reqEnv(name: string, v: string | undefined): string {
   if (!v) throw new Error(`Missing env var: ${name}`);
@@ -303,45 +306,52 @@ export async function getProgram(programId: string): Promise<Program | null> {
 
 export async function createSuggestion(input: SuggestionInput): Promise<string> {
   const notion = notionClient();
-  const dbId = reqEnv("NOTION_SUGGESTIONS_DB_ID", NOTION_SUGGESTIONS_DB_ID);
-  const dbSchema: any = await notion.databases.retrieve({ database_id: dbId });
-  const schemaProps = dbSchema?.properties ?? {};
-  const props: Record<string, any> = {};
+  if (!NOTION_TOKEN) throw new Error("Missing NOTION_TOKEN");
+  if (!NOTION_SUGGESTIONS_DB_ID) throw new Error("Missing NOTION_SUGGESTIONS_DB_ID");
 
-  const titleProp = pickExistingProperty(schemaProps, ["Title"], "title") ?? pickByType(schemaProps, "title");
-  if (titleProp) {
-    props[titleProp] = {
-      title: [{ type: "text", text: { content: input.title.slice(0, 1900) } }],
-    };
-  }
-
-  setSchemaValue(props, schemaProps, ["Suggestion Type", "Type"], input.suggestionType, ["select", "status"]);
-  setSchemaValue(props, schemaProps, ["Related Program ID", "Program ID"], input.relatedProgramId, ["rich_text"]);
-  setSchemaValue(props, schemaProps, ["Program URL", "URL", "Program Link"], input.programUrl, ["url", "rich_text"]);
-  setSchemaValue(props, schemaProps, ["Provider"], input.provider, ["rich_text"]);
-  setSchemaValue(props, schemaProps, ["Category"], input.category ?? [], ["multi_select"]);
-  setSchemaValue(props, schemaProps, ["Stage"], input.stage ?? [], ["multi_select"]);
-  setSchemaValue(props, schemaProps, ["What you get", "What You Get"], input.whatYouGet, ["rich_text"]);
-  setSchemaValue(props, schemaProps, ["Eligibility"], input.eligibility, ["rich_text"]);
-  setSchemaValue(props, schemaProps, ["Proposed change", "Proposed Change"], input.proposedChange, ["rich_text"]);
-  setSchemaValue(props, schemaProps, ["Submitter email", "Email"], input.submitterEmail, ["rich_text", "email"]);
-  setSchemaValue(props, schemaProps, ["Evidence / Source URL", "Evidence URL", "Source URL"], input.evidenceUrl, ["url", "rich_text"]);
-  setSchemaValue(props, schemaProps, ["Notes"], input.notes, ["rich_text"]);
-
-  const statusProp =
-    pickExistingProperty(schemaProps, ["Status"], "status") ??
-    pickExistingProperty(schemaProps, ["Status"], "select");
-  if (statusProp && optionExists(schemaProps[statusProp], "Pending")) {
-    if (schemaProps[statusProp].type === "status") {
-      props[statusProp] = { status: { name: "Pending" } };
-    } else {
-      props[statusProp] = { select: { name: "Pending" } };
-    }
-  }
+  const properties: Record<string, any> = {
+    Title: {
+      title: [{ text: { content: input.title.slice(0, 2000) } }],
+    },
+    "Suggestion Type": {
+      select: { name: input.suggestionType },
+    },
+    Status: {
+      select: { name: "Pending" },
+    },
+    ...(input.relatedProgramId
+      ? { "Related Program ID": { rich_text: [{ text: { content: input.relatedProgramId.slice(0, 2000) } }] } }
+      : {}),
+    ...(input.programUrl ? { "Program URL": { url: input.programUrl } } : {}),
+    ...(input.provider
+      ? { Provider: { rich_text: [{ text: { content: input.provider.slice(0, 2000) } }] } }
+      : {}),
+    ...(Array.isArray(input.category) && input.category.length
+      ? { Category: { multi_select: input.category.map((c) => ({ name: c })) } }
+      : {}),
+    ...(Array.isArray(input.stage) && input.stage.length
+      ? { Stage: { multi_select: input.stage.map((s) => ({ name: s })) } }
+      : {}),
+    ...(input.whatYouGet
+      ? { "What you get": { rich_text: [{ text: { content: input.whatYouGet.slice(0, 2000) } }] } }
+      : {}),
+    ...(input.eligibility
+      ? { Eligibility: { rich_text: [{ text: { content: input.eligibility.slice(0, 2000) } }] } }
+      : {}),
+    ...(input.proposedChange
+      ? { "Proposed change": { rich_text: [{ text: { content: input.proposedChange.slice(0, 2000) } }] } }
+      : {}),
+    ...(input.evidenceUrl ? { "Evidence / Source URL": { url: input.evidenceUrl } } : {}),
+    ...(input.submitterEmail ? { "Submitter email": { email: input.submitterEmail } } : {}),
+    ...(input.programId
+      ? { "Program ID": { rich_text: [{ text: { content: input.programId.slice(0, 2000) } }] } }
+      : {}),
+    ...(input.notes ? { Notes: { rich_text: [{ text: { content: input.notes.slice(0, 2000) } }] } } : {}),
+  };
 
   const page: any = await notion.pages.create({
-    parent: { database_id: dbId },
-    properties: props,
+    parent: { database_id: NOTION_SUGGESTIONS_DB_ID },
+    properties,
   });
   return page.id;
 }
