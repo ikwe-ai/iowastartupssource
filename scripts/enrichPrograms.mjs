@@ -60,6 +60,25 @@ function stripTags(html) {
     .trim();
 }
 
+function looksLikeBoilerplate(text) {
+  const s = normalize(text);
+  if (!s) return true;
+  const junk = [
+    "privacy policy",
+    "terms of service",
+    "cookie",
+    "sign in",
+    "create account",
+    "subscribe",
+    "all rights reserved",
+    "javascript",
+    "enable cookies",
+    "menu",
+  ];
+  const hitCount = junk.filter((j) => s.includes(j)).length;
+  return hitCount >= 2;
+}
+
 function sentenceSplit(text) {
   return String(text || "")
     .split(/(?<=[.!?])\s+/)
@@ -123,14 +142,20 @@ async function fetchPageText(url) {
         accept: "text/html,application/xhtml+xml",
       },
     });
+    const contentType = String(res.headers.get("content-type") || "");
+    const isPdf = contentType.includes("application/pdf") || normalize(url).endsWith(".pdf");
     const html = await res.text();
     const title = extractTitle(html);
     const description = extractMeta(html, "description") || extractMeta(html, "og:description");
     const body = stripTags(html);
+    const blocked = !res.ok || body.length < 120 || looksLikeBoilerplate(body);
     return {
       ok: res.ok,
       status: res.status,
       finalUrl: res.url || url,
+      contentType,
+      isPdf,
+      blocked,
       title,
       description,
       body,
@@ -138,6 +163,37 @@ async function fetchPageText(url) {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function hasConstraintSignals(text) {
+  return /\b(iowa|us|u\.s\.|student|startup|founder|company|cohort|must|requires|requirement|eligible)\b/i.test(
+    String(text || ""),
+  );
+}
+
+function hasConcreteValueSignals(text) {
+  return /\$[\d,]+|\b\d+(k|m|%)\b|\b(credits?|grant|funding|discount|save)\b/i.test(String(text || ""));
+}
+
+function hasApplySignals(text) {
+  return /\b(apply|application|submit|form|join|enroll|approval)\b/i.test(String(text || ""));
+}
+
+function confidenceForExtraction({ whatYouGet, eligibility, howToApply, blocked, isPdf }) {
+  if (blocked || isPdf) return "Low";
+  let score = 0;
+  if (whatYouGet && whatYouGet.length >= 120) score += 2;
+  if (hasConcreteValueSignals(whatYouGet)) score += 2;
+  if (eligibility && eligibility.length >= 80) score += 2;
+  if (hasConstraintSignals(eligibility)) score += 2;
+  if (howToApply && howToApply.length >= 40) score += 1;
+  if (hasApplySignals(howToApply)) score += 1;
+  if (looksLikeBoilerplate(whatYouGet) || looksLikeBoilerplate(eligibility) || looksLikeBoilerplate(howToApply)) {
+    score -= 4;
+  }
+  if (score >= 7) return "High";
+  if (score >= 4) return "Medium";
+  return "Low";
 }
 
 function optionExists(spec, value) {
@@ -201,6 +257,10 @@ async function main() {
   const howToApplyProp = resolveProperty(schema, ["How to apply", "How To Apply", "Application Steps"], ["rich_text"]);
   const autoSummaryProp = resolveProperty(schema, ["Auto summary", "Auto Summary", "Notes"], ["rich_text"]);
   const sourceSummaryProp = resolveProperty(schema, ["Source Summary", "Summary", "Description"], ["rich_text"]);
+  const confidenceProp = resolveProperty(schema, ["Extraction confidence", "Confidence", "Extract Confidence"], [
+    "select",
+    "status",
+  ]);
   const finalUrlProp = resolveProperty(schema, ["Final URL"], ["url", "rich_text"]);
   const lastVerifiedProp = resolveProperty(schema, ["Last Verified", "Last Verified At"], ["date"]);
 
@@ -277,11 +337,23 @@ async function main() {
         "review",
         "approval",
       ]);
-      const howToApply = howToApplyExtract || "Apply via the official program page.";
+      const howToApply = source.isPdf
+        ? "PDF resource. Review manually and apply via linked source."
+        : howToApplyExtract || "Apply via the official program page.";
       const sourceSummary = source.description || pickTopSentences(textCorpus, ["program", "startup", "apply"], 260);
+      const confidence = confidenceForExtraction({
+        whatYouGet,
+        eligibility,
+        howToApply,
+        blocked: source.blocked,
+        isPdf: source.isPdf,
+      });
       const autoSummary = [
         `HTTP: ${source.status}`,
         `Final URL: ${source.finalUrl}`,
+        `Type: ${source.contentType || "unknown"}`,
+        source.blocked ? "Blocked/low-content response detected" : "",
+        source.isPdf ? "PDF detected (manual review suggested)" : "",
         source.title ? `Title: ${source.title}` : "",
         source.description ? `Meta: ${source.description}` : "",
       ]
@@ -295,11 +367,17 @@ async function main() {
         ...(mkPropValue(howToApplyProp, howToApply) || {}),
         ...(mkPropValue(autoSummaryProp, autoSummary) || {}),
         ...(mkPropValue(sourceSummaryProp, sourceSummary) || {}),
+        ...(mkPropValue(confidenceProp, confidence) || {}),
         ...(mkPropValue(finalUrlProp, source.finalUrl) || {}),
         ...(mkPropValue(lastVerifiedProp, today) || {}),
       };
 
-      if (flagUnparsedForReview && !whatYouGet && !eligibility && reviewProp) {
+      if ((flagUnparsedForReview && (!whatYouGet || !eligibility || !howToApply)) || confidence === "Low") {
+        if (reviewProp) {
+          Object.assign(updates, mkPropValue(reviewProp, true) || {});
+        }
+      }
+      if (source.blocked && reviewProp) {
         Object.assign(updates, mkPropValue(reviewProp, true) || {});
       }
 
@@ -311,7 +389,7 @@ async function main() {
       if (whatYouGet || eligibility || sourceSummary) enriched += 1;
 
       console.log(
-        `[${dryRun ? "DRY" : "OK"}] ${programName}: ${source.status} what=${whatYouGet ? "yes" : "no"} elig=${eligibility ? "yes" : "no"} apply=${howToApply ? "yes" : "no"}`,
+        `[${dryRun ? "DRY" : "OK"}] ${programName}: ${source.status} what=${whatYouGet ? "yes" : "no"} elig=${eligibility ? "yes" : "no"} apply=${howToApply ? "yes" : "no"} conf=${confidence}`,
       );
     } catch (err) {
       failed += 1;
