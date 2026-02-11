@@ -198,6 +198,8 @@ async function main() {
 
   const whatProp = resolveProperty(schema, ["What you get", "What You Get", "Offer Summary", "Offer"], ["rich_text"]);
   const eligibilityProp = resolveProperty(schema, ["Eligibility Summary", "Eligibility", "Who qualifies"], ["rich_text"]);
+  const howToApplyProp = resolveProperty(schema, ["How to apply", "How To Apply", "Application Steps"], ["rich_text"]);
+  const autoSummaryProp = resolveProperty(schema, ["Auto summary", "Auto Summary", "Notes"], ["rich_text"]);
   const sourceSummaryProp = resolveProperty(schema, ["Source Summary", "Summary", "Description"], ["rich_text"]);
   const finalUrlProp = resolveProperty(schema, ["Final URL"], ["url", "rich_text"]);
   const lastVerifiedProp = resolveProperty(schema, ["Last Verified", "Last Verified At"], ["date"]);
@@ -264,11 +266,34 @@ async function main() {
         "student",
         "company",
       ]);
+      const howToApplyExtract = pickTopSentences(textCorpus, [
+        "apply",
+        "application",
+        "submit",
+        "sign up",
+        "join",
+        "enroll",
+        "form",
+        "review",
+        "approval",
+      ]);
+      const howToApply = howToApplyExtract || "Apply via the official program page.";
       const sourceSummary = source.description || pickTopSentences(textCorpus, ["program", "startup", "apply"], 260);
+      const autoSummary = [
+        `HTTP: ${source.status}`,
+        `Final URL: ${source.finalUrl}`,
+        source.title ? `Title: ${source.title}` : "",
+        source.description ? `Meta: ${source.description}` : "",
+      ]
+        .filter(Boolean)
+        .join(" | ")
+        .slice(0, 1800);
 
       const updates = {
         ...(mkPropValue(whatProp, whatYouGet) || {}),
         ...(mkPropValue(eligibilityProp, eligibility) || {}),
+        ...(mkPropValue(howToApplyProp, howToApply) || {}),
+        ...(mkPropValue(autoSummaryProp, autoSummary) || {}),
         ...(mkPropValue(sourceSummaryProp, sourceSummary) || {}),
         ...(mkPropValue(finalUrlProp, source.finalUrl) || {}),
         ...(mkPropValue(lastVerifiedProp, today) || {}),
@@ -286,9 +311,7 @@ async function main() {
       if (whatYouGet || eligibility || sourceSummary) enriched += 1;
 
       console.log(
-        `[${dryRun ? "DRY" : "OK"}] ${programName}: ${source.status} what=${whatYouGet ? "yes" : "no"} elig=${
-          eligibility ? "yes" : "no"
-        }`,
+        `[${dryRun ? "DRY" : "OK"}] ${programName}: ${source.status} what=${whatYouGet ? "yes" : "no"} elig=${eligibility ? "yes" : "no"} apply=${howToApply ? "yes" : "no"}`,
       );
     } catch (err) {
       failed += 1;
@@ -304,4 +327,3 @@ main().catch((err) => {
   console.error("enrichPrograms failed:", err?.message || err);
   process.exit(1);
 });
-
