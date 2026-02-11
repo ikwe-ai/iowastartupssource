@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { listPrograms } from "@/lib/notion";
 
+export const dynamic = "force-dynamic";
+
 function csvEscape(v: string) {
   const needsQuotes = /[",\n]/.test(v);
   const escaped = v.replace(/"/g, '""');
