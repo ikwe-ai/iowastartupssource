@@ -75,50 +75,64 @@ export default function DirectoryFilters({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-2 md:grid-cols-4">
-        <input
-          className="w-full rounded border p-2"
-          placeholder="Search (name, provider, category...)"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
+      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+        <div className="grid gap-2 md:grid-cols-4">
+          <input
+            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            placeholder="Search (name, provider, category...)"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
 
-        <select className="w-full rounded border p-2" value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+          <select
+            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">All categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
 
-        <select className="w-full rounded border p-2" value={stage} onChange={(e) => setStage(e.target.value)}>
-          <option value="">All stages</option>
-          {stages.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+          <select
+            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            value={stage}
+            onChange={(e) => setStage(e.target.value)}
+          >
+            <option value="">All stages</option>
+            {stages.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
 
-        <select className="w-full rounded border p-2" value={sort} onChange={(e) => setSort(e.target.value as any)}>
-          <option value="provider">Sort: Provider A→Z</option>
-          <option value="value">Sort: Value high→low</option>
-        </select>
+          <select
+            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as any)}
+          >
+            <option value="provider">Sort: Provider A→Z</option>
+            <option value="value">Sort: Value high→low</option>
+          </select>
 
-        <label className="flex items-center gap-2 text-sm md:col-span-2">
-          <input type="checkbox" checked={onlyIowa} onChange={(e) => setOnlyIowa(e.target.checked)} />
-          Iowa-only (geo contains "Iowa")
-        </label>
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <input type="checkbox" checked={onlyIowa} onChange={(e) => setOnlyIowa(e.target.checked)} />
+            Iowa-only (geo contains "Iowa")
+          </label>
 
-        <button
-          className="rounded border px-3 py-2 text-sm md:col-span-2"
-          onClick={() => {
-            setQ("");
-            setCategory("");
-            setStage("");
-            setOnlyIowa(false);
-            setSort("provider");
-          }}
-        >
-          Reset
-        </button>
+          <button
+            className="rounded-xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-2"
+            onClick={() => {
+              setQ("");
+              setCategory("");
+              setStage("");
+              setOnlyIowa(false);
+              setSort("provider");
+            }}
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       <div className="text-sm opacity-80">
@@ -127,7 +141,7 @@ export default function DirectoryFilters({
 
       <div className="grid gap-3">
         {filtered.map((p) => (
-          <Link key={p.id} href={`/program/${p.id}`} className="block rounded-lg border p-4 hover:bg-zinc-50">
+          <Link key={p.id} href={`/program/${p.id}`} className="block rounded-2xl border bg-white p-5 shadow-sm hover:bg-zinc-50">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="font-medium">{p.name || "Untitled Program"}</div>
@@ -135,7 +149,7 @@ export default function DirectoryFilters({
 
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   {(p.category || []).slice(0, 4).map((c) => (
-                    <span key={c} className="rounded-full border px-2 py-1">{c}</span>
+                    <span key={c} className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700">{c}</span>
                   ))}
                   {p.requiresReferral && <span className="rounded-full border px-2 py-1">Referral</span>}
                   {p.geo && <span className="rounded-full border px-2 py-1">{p.geo}</span>}

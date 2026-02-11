@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 :root { color-scheme: light; }
-body { @apply bg-white text-zinc-900; }
+
+body {
+  @apply bg-zinc-50 text-zinc-900;
+}
+
 a { @apply text-zinc-900; }

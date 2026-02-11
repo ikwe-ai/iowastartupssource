@@ -10,39 +10,66 @@ export default async function Home({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-xl border p-6 space-y-3">
-        <h1 className="text-2xl font-semibold">Iowa Startups Source</h1>
-        <p className="opacity-80 max-w-3xl">
-          A living directory of credits, perks, accelerators, and non-dilutive programs to extend runway for Iowa founders.
-          Built by Ikwe.ai - ecosystem infrastructure, not a pitch deck.
-        </p>
+      <section className="rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-zinc-600">
+            Iowa ecosystem resource • updated by community
+          </div>
 
-        <div className="grid gap-2 md:grid-cols-3 pt-2">
-          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?category=LLM%2FAPI%20Credits">
-            <div className="font-medium">AI Credits Stack</div>
-            <div className="text-sm opacity-80">LLM/API credits to apply for this week</div>
-          </a>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Find credits & programs that extend runway
+          </h1>
 
-          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?category=Cloud%20Credits">
-            <div className="font-medium">Cloud Runway Stack</div>
-            <div className="text-sm opacity-80">Cloud credits + startup infra perks</div>
-          </a>
+          <p className="max-w-3xl text-zinc-600">
+            A curated directory of startup credits, perks, accelerators, and non-dilutive programs for Iowa founders.
+            Verified entries only (Active + not flagged for review).
+          </p>
 
-          <a className="rounded-lg border p-4 hover:bg-zinc-50" href="/?q=VentureNet">
-            <div className="font-medium">Iowa Non-Dilutive Stack</div>
-            <div className="text-sm opacity-80">VentureNet + state ecosystem resources</div>
-          </a>
-        </div>
-
-        <div className="text-sm pt-2">
-          <a className="underline" href="/submit">Suggest a program</a>
-          <span className="opacity-60"> - </span>
-          <a className="underline" href="/about">How this works</a>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <a
+              href="/submit"
+              className="rounded-full bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800"
+            >
+              Suggest a program
+            </a>
+            <a
+              href="/about"
+              className="rounded-full border bg-white px-4 py-2 text-sm hover:bg-zinc-50"
+            >
+              How it works
+            </a>
+          </div>
         </div>
       </section>
 
+      <section className="grid gap-3 md:grid-cols-3">
+        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?category=LLM%2FAPI%20Credits">
+          <div className="text-sm text-zinc-500">Stack</div>
+          <div className="mt-1 text-lg font-semibold">AI Credits</div>
+          <div className="mt-2 text-sm text-zinc-600">LLM/API credits to apply for this week.</div>
+        </a>
+
+        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?category=Cloud%20Credits">
+          <div className="text-sm text-zinc-500">Stack</div>
+          <div className="mt-1 text-lg font-semibold">Cloud Runway</div>
+          <div className="mt-2 text-sm text-zinc-600">AWS/GCP/Azure + infra perks.</div>
+        </a>
+
+        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?q=VentureNet">
+          <div className="text-sm text-zinc-500">Stack</div>
+          <div className="mt-1 text-lg font-semibold">Iowa Non-Dilutive</div>
+          <div className="mt-2 text-sm text-zinc-600">State programs + VentureNet pathways.</div>
+        </a>
+      </section>
+
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Directory</h2>
+        <div className="flex items-end justify-between gap-4">
+          <h2 className="text-xl font-semibold">Directory</h2>
+          <div className="text-sm text-zinc-500">
+            {programs.length} approved entries
+          </div>
+        </div>
+
         <DirectoryFilters
           programs={programs as any}
           initialQuery={searchParams?.q || ""}
