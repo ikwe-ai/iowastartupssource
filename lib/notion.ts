@@ -43,6 +43,10 @@ function selectName(prop: any): string | undefined {
   return prop?.select?.name;
 }
 
+function statusName(prop: any): string | undefined {
+  return prop?.status?.name;
+}
+
 function multiSelectNames(prop: any): string[] {
   return (prop?.multi_select ?? []).map((x: any) => x.name);
 }
@@ -68,53 +72,67 @@ export function notionClient() {
   return new Client({ auth: reqEnv("NOTION_TOKEN", NOTION_TOKEN) });
 }
 
+function pickExistingProperty(
+  allProperties: Record<string, any>,
+  names: string[],
+  type?: string,
+): string | undefined {
+  const normalized = new Set(names.map((n) => n.toLowerCase()));
+  for (const [propName, spec] of Object.entries(allProperties)) {
+    const nameMatches = normalized.has(propName.toLowerCase());
+    if (!nameMatches) continue;
+    if (!type || spec?.type === type) return propName;
+  }
+  return undefined;
+}
+
 export async function listPrograms(): Promise<Program[]> {
   const notion = notionClient();
   const dbId = reqEnv("NOTION_PROGRAMS_DB_ID", NOTION_PROGRAMS_DB_ID);
 
-  const baseQuery = {
-    database_id: dbId,
-    page_size: 200 as const,
-  };
+  const dbSchema: any = await notion.databases.retrieve({ database_id: dbId });
+  const schemaProps = dbSchema?.properties ?? {};
 
-  let resp: any;
-  try {
-    resp = await notion.databases.query({
-      ...baseQuery,
-      filter: {
-        and: [
-          {
-            property: "Status",
-            status: { equals: "Active" },
-          },
-          {
-            property: "Needs Review",
-            checkbox: { equals: false },
-          },
-        ],
-      },
+  const statusProp =
+    pickExistingProperty(schemaProps, ["Status"], "status") ??
+    pickExistingProperty(schemaProps, ["Status"], "select");
+  const statusType = statusProp ? schemaProps[statusProp]?.type : undefined;
+  const reviewProp = pickExistingProperty(schemaProps, [
+    "Needs Review",
+    "Needs review",
+    "NeedsReview",
+    "Review Needed",
+    "Needs QA",
+  ], "checkbox");
+
+  const filters: any[] = [];
+  if (statusProp && statusType === "status") {
+    filters.push({
+      property: statusProp,
+      status: { equals: "Active" },
     });
-  } catch (err: any) {
-    const message = String(err?.message || "");
-    const isStatusTypeMismatch = message.includes("database property status does not match filter status");
-    if (!isStatusTypeMismatch) throw err;
-
-    resp = await notion.databases.query({
-      ...baseQuery,
-      filter: {
-        and: [
-          {
-            property: "Status",
-            select: { equals: "Active" },
-          },
-          {
-            property: "Needs Review",
-            checkbox: { equals: false },
-          },
-        ],
-      },
+  } else if (statusProp && statusType === "select") {
+    filters.push({
+      property: statusProp,
+      select: { equals: "Active" },
     });
   }
+  if (reviewProp) {
+    filters.push({
+      property: reviewProp,
+      checkbox: { equals: false },
+    });
+  }
+
+  const resp = await notion.databases.query({
+    database_id: dbId,
+    page_size: 200,
+    ...(filters.length === 0
+      ? {}
+      : filters.length === 1
+        ? { filter: filters[0] }
+        : { filter: { and: filters } }),
+  });
 
   return resp.results.map((page: any) => {
     const props = page.properties ?? {};
@@ -137,10 +155,15 @@ export async function listPrograms(): Promise<Program[]> {
       applyUrl: url(props["Application Link"]) ?? url(props["Apply URL"]),
       sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      status: selectName(props["Status"]) ?? textFromRich(props["Status"]),
+      status: statusName(props["Status"]) ?? selectName(props["Status"]) ?? textFromRich(props["Status"]),
       confidence: selectName(props["Confidence"]) ?? textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
-      needsReview: checkbox(props["Needs Review"]),
+      needsReview:
+        checkbox(props["Needs Review"]) ??
+        checkbox(props["Needs review"]) ??
+        checkbox(props["NeedsReview"]) ??
+        checkbox(props["Review Needed"]) ??
+        checkbox(props["Needs QA"]),
     };
   });
 }
@@ -168,10 +191,15 @@ export async function getProgram(programId: string): Promise<Program | null> {
       applyUrl: url(props["Application Link"]) ?? url(props["Apply URL"]),
       sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      status: selectName(props["Status"]) ?? textFromRich(props["Status"]),
+      status: statusName(props["Status"]) ?? selectName(props["Status"]) ?? textFromRich(props["Status"]),
       confidence: selectName(props["Confidence"]) ?? textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
-      needsReview: checkbox(props["Needs Review"]),
+      needsReview:
+        checkbox(props["Needs Review"]) ??
+        checkbox(props["Needs review"]) ??
+        checkbox(props["NeedsReview"]) ??
+        checkbox(props["Review Needed"]) ??
+        checkbox(props["Needs QA"]),
     };
   } catch {
     return null;
