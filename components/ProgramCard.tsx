@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 type Program = {
   id: string;
@@ -53,6 +56,7 @@ export default function ProgramCard({
   isSaved?: boolean;
   onToggleSave?: (id: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
   const summary = (p.founderSnapshot || p.whatYouGet || p.autoSummary || p.notes || "").trim();
   const valueLine = oneLine(
@@ -129,6 +133,33 @@ export default function ProgramCard({
               <p className="italic text-zinc-500">No summary yet - suggest an update.</p>
             )
           ) : null}
+
+          {(p.eligibilitySummary || p.howToApply) && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-1 inline-flex rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+            >
+              {expanded ? "Hide quick view" : "Quick view"}
+            </button>
+          )}
+
+          {expanded && (
+            <div className="mt-2 grid gap-2 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3 text-xs">
+              {p.eligibilitySummary && (
+                <div>
+                  <div className="font-medium text-zinc-600">Eligibility</div>
+                  <p className="mt-1 whitespace-pre-line text-zinc-800">{p.eligibilitySummary}</p>
+                </div>
+              )}
+              {p.howToApply && (
+                <div>
+                  <div className="font-medium text-zinc-600">How to apply</div>
+                  <p className="mt-1 whitespace-pre-line text-zinc-800">{p.howToApply}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
