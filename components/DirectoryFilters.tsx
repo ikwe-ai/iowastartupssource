@@ -13,6 +13,7 @@ type Program = {
   whatYouGet?: string;
   eligibilitySummary?: string;
   howToApply?: string;
+  sourceSummary?: string;
   autoSummary?: string;
   notes?: string;
   stage?: string[];
@@ -46,6 +47,10 @@ export default function DirectoryFilters({
   const [sort, setSort] = useState<"provider" | "value">("provider");
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : "", savedOnly ? "saved" : ""].filter(Boolean).length;
+
+  function onSortChange(v: string) {
+    setSort(v === "value" ? "value" : "provider");
+  }
 
   useEffect(() => {
     try {
@@ -98,7 +103,7 @@ export default function DirectoryFilters({
       if (savedOnly && !savedIds.includes(p.id)) return false;
 
       if (query) {
-        const hay = `${p.name} ${p.provider} ${(p.category || []).join(" ")} ${(p.stage || []).join(" ")} ${p.whatYouGet || ""} ${p.eligibilitySummary || ""} ${p.howToApply || ""}`.toLowerCase();
+        const hay = `${p.name} ${p.provider} ${(p.category || []).join(" ")} ${(p.stage || []).join(" ")} ${p.whatYouGet || ""} ${p.eligibilitySummary || ""} ${p.howToApply || ""} ${p.sourceSummary || ""} ${p.autoSummary || ""}`.toLowerCase();
         if (!hay.includes(query)) return false;
       }
 
@@ -150,7 +155,7 @@ export default function DirectoryFilters({
           <select
             className="w-full rounded-2xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
             value={sort}
-            onChange={(e) => setSort(e.target.value as any)}
+            onChange={(e) => onSortChange(e.target.value)}
           >
             <option value="provider">Sort: Provider A→Z</option>
             <option value="value">Sort: Value high→low</option>
@@ -158,7 +163,7 @@ export default function DirectoryFilters({
 
           <label className="flex items-center gap-2 text-sm md:col-span-2">
             <input type="checkbox" checked={onlyIowa} onChange={(e) => setOnlyIowa(e.target.checked)} />
-            Iowa-only (geo contains "Iowa")
+            Iowa-only (geo contains &quot;Iowa&quot;)
           </label>
 
           <label className="flex items-center gap-2 text-sm md:col-span-2">

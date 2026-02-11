@@ -15,6 +15,7 @@ type Program = {
   whatYouGet?: string;
   eligibilitySummary?: string;
   howToApply?: string;
+  sourceSummary?: string;
   autoSummary?: string;
   notes?: string;
   offerType?: string;
@@ -58,7 +59,7 @@ export default function ProgramCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
-  const summary = (p.founderSnapshot || p.whatYouGet || p.autoSummary || p.notes || "").trim();
+  const summary = (p.founderSnapshot || p.whatYouGet || p.sourceSummary || p.autoSummary || p.notes || "").trim();
   const valueLine = oneLine(
     p.whatYouGet ||
       (typeof p.valueUsdEst === "number" ? `Estimated value: $${p.valueUsdEst.toLocaleString()}` : "") ||

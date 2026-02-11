@@ -1,12 +1,12 @@
 import DirectoryFilters from "@/components/DirectoryFilters";
-import { listPrograms } from "@/lib/notion";
+import { listPrograms, type Program } from "@/lib/notion";
 
 export default async function Home({
   searchParams,
 }: {
   searchParams?: { q?: string; category?: string; stage?: string };
 }) {
-  const programs = await listPrograms();
+  const programs: Program[] = await listPrograms();
 
   return (
     <div className="space-y-8">
@@ -89,7 +89,7 @@ export default async function Home({
         </div>
 
         <DirectoryFilters
-          programs={programs as any}
+          programs={programs}
           initialQuery={searchParams?.q || ""}
           initialCategory={searchParams?.category || ""}
           initialStage={searchParams?.stage || ""}

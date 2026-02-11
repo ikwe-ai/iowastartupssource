@@ -80,6 +80,12 @@ function multiSelectNames(prop: any): string[] {
   return (prop?.multi_select ?? []).map((x: any) => x.name);
 }
 
+function pickStage(props: Record<string, any>): string[] {
+  const stage = multiSelectNames(props["Stage"]);
+  if (stage.length > 0) return stage;
+  return multiSelectNames(props["Best For Stage"]);
+}
+
 function checkbox(prop: any): boolean | undefined {
   return prop?.checkbox;
 }
@@ -228,7 +234,7 @@ export async function listPrograms(): Promise<Program[]> {
     const name = textFromTitle(props["Name"]);
     const provider = selectName(props["Provider"]) ?? textFromRich(props["Provider"]) ?? "Unknown";
     const category = multiSelectNames(props["Category"]);
-    const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
+    const stage = pickStage(props);
     return {
       id: page.id,
       programId: textFromRich(props["Program ID"]),
@@ -279,7 +285,7 @@ export async function getProgram(programId: string): Promise<Program | null> {
     const name = textFromTitle(props["Name"]);
     const provider = selectName(props["Provider"]) ?? textFromRich(props["Provider"]) ?? "Unknown";
     const category = multiSelectNames(props["Category"]);
-    const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
+    const stage = pickStage(props);
     return {
       id: page.id,
       programId: textFromRich(props["Program ID"]),
