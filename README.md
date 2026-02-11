@@ -71,3 +71,17 @@ Print Suggestions DB property names/types to map form fields exactly:
 ```bash
 npm run schema:suggestions
 ```
+
+## Perks gap analysis
+Compare a perks marketplace HTML export with your Notion Programs DB and generate a missing-deals report.
+
+```bash
+npm run gap:perks -- perks-believe.html
+```
+
+Output:
+- `reports/perks-gap-report-YYYY-MM-DD.md`
+
+Tips:
+- Save page source from perks-like marketplaces as a local `.html` file.
+- Review report rows before importing; matching is heuristic.
