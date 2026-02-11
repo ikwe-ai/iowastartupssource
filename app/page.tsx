@@ -83,6 +83,11 @@ export default async function Home({
           </div>
         </div>
 
+        <div className="rounded-2xl border bg-white/80 p-4 text-sm text-zinc-700 shadow-sm backdrop-blur">
+          <div className="font-medium">How founders use this page</div>
+          <div className="mt-1">1) Scan cards for value, fit, and steps. 2) Save promising programs for later. 3) Open details when ready to act.</div>
+        </div>
+
         <DirectoryFilters
           programs={programs as any}
           initialQuery={searchParams?.q || ""}

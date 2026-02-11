@@ -44,17 +44,25 @@ function oneLine(text?: string, max = 120) {
   return `${clean.slice(0, max - 1).trimEnd()}…`;
 }
 
-export default function ProgramCard({ p }: { p: Program }) {
+export default function ProgramCard({
+  p,
+  isSaved = false,
+  onToggleSave,
+}: {
+  p: Program;
+  isSaved?: boolean;
+  onToggleSave?: (id: string) => void;
+}) {
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
   const summary = (p.founderSnapshot || p.whatYouGet || p.autoSummary || p.notes || "").trim();
   const valueLine = oneLine(
     p.whatYouGet ||
       (typeof p.valueUsdEst === "number" ? `Estimated value: $${p.valueUsdEst.toLocaleString()}` : "") ||
       (p.offerType ? `${p.offerType} program for startups.` : ""),
-    150,
+    220,
   );
-  const qualifyLine = oneLine(p.eligibilitySummary || "", 140);
-  const applyLine = oneLine(p.howToApply || "", 140);
+  const qualifyLine = oneLine(p.eligibilitySummary || "", 200);
+  const applyLine = oneLine(p.howToApply || "", 200);
   const ago = daysAgo(p.lastVerifiedAt);
 
   return (
@@ -116,7 +124,7 @@ export default function ProgramCard({ p }: { p: Program }) {
           ) : null}
           {!valueLine && !qualifyLine && !applyLine ? (
             summary ? (
-              <p className="line-clamp-2 text-zinc-800">{oneLine(summary, 180)}</p>
+              <p className="text-zinc-800">{oneLine(summary, 240)}</p>
             ) : (
               <p className="italic text-zinc-500">No summary yet - suggest an update.</p>
             )
@@ -132,6 +140,17 @@ export default function ProgramCard({ p }: { p: Program }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {onToggleSave ? (
+            <button
+              type="button"
+              onClick={() => onToggleSave(p.id)}
+              className={`rounded-full border px-4 py-2 text-sm ${
+                isSaved ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 hover:bg-zinc-50"
+              }`}
+            >
+              {isSaved ? "Saved" : "Save"}
+            </button>
+          ) : null}
           <Link href={`/program/${p.id}`} className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90">
             Read details
           </Link>

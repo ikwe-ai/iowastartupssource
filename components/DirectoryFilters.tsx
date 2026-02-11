@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProgramCard from "@/components/ProgramCard";
 
 type Program = {
@@ -42,8 +42,35 @@ export default function DirectoryFilters({
   const [category, setCategory] = useState(initialCategory);
   const [stage, setStage] = useState(initialStage);
   const [onlyIowa, setOnlyIowa] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(false);
   const [sort, setSort] = useState<"provider" | "value">("provider");
-  const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : ""].filter(Boolean).length;
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : "", savedOnly ? "saved" : ""].filter(Boolean).length;
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("savedPrograms");
+      if (!raw) return;
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        setSavedIds(arr.filter((x) => typeof x === "string"));
+      }
+    } catch {
+      // no-op
+    }
+  }, []);
+
+  function toggleSaved(id: string) {
+    setSavedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      try {
+        localStorage.setItem("savedPrograms", JSON.stringify(next));
+      } catch {
+        // no-op
+      }
+      return next;
+    });
+  }
 
   const categories = useMemo(() => {
     const s = new Set<string>();
@@ -68,9 +95,10 @@ export default function DirectoryFilters({
         const g = (p.geo || "").toLowerCase();
         if (!g.includes("iowa")) return false;
       }
+      if (savedOnly && !savedIds.includes(p.id)) return false;
 
       if (query) {
-        const hay = `${p.name} ${p.provider} ${(p.category || []).join(" ")} ${(p.stage || []).join(" ")}`.toLowerCase();
+        const hay = `${p.name} ${p.provider} ${(p.category || []).join(" ")} ${(p.stage || []).join(" ")} ${p.whatYouGet || ""} ${p.eligibilitySummary || ""} ${p.howToApply || ""}`.toLowerCase();
         if (!hay.includes(query)) return false;
       }
 
@@ -84,7 +112,7 @@ export default function DirectoryFilters({
     }
 
     return out;
-  }, [programs, q, category, stage, onlyIowa, sort]);
+  }, [programs, q, category, stage, onlyIowa, savedOnly, savedIds, sort]);
 
   return (
     <div className="space-y-4">
@@ -133,13 +161,19 @@ export default function DirectoryFilters({
             Iowa-only (geo contains "Iowa")
           </label>
 
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <input type="checkbox" checked={savedOnly} onChange={(e) => setSavedOnly(e.target.checked)} />
+            Saved only
+          </label>
+
           <button
-            className="rounded-2xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-2"
+            className="rounded-2xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-4"
             onClick={() => {
               setQ("");
               setCategory("");
               setStage("");
               setOnlyIowa(false);
+              setSavedOnly(false);
               setSort("provider");
             }}
           >
@@ -177,7 +211,7 @@ export default function DirectoryFilters({
       ) : (
         <div className="grid gap-3">
           {filtered.map((p) => (
-            <ProgramCard key={p.id} p={p} />
+            <ProgramCard key={p.id} p={p} isSaved={savedIds.includes(p.id)} onToggleSave={toggleSaved} />
           ))}
         </div>
       )}
