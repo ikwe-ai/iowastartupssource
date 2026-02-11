@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import { unstable_noStore as noStore } from "next/cache";
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const NOTION_PROGRAMS_DB_ID = process.env.NOTION_PROGRAMS_DB_ID;
@@ -218,6 +219,7 @@ function setSchemaValue(
 }
 
 export async function listPrograms(): Promise<Program[]> {
+  noStore();
   const notion = notionClient();
   const dbId = reqEnv("NOTION_PROGRAMS_DB_ID", NOTION_PROGRAMS_DB_ID);
 
@@ -287,6 +289,7 @@ export async function listPrograms(): Promise<Program[]> {
 }
 
 export async function getProgram(programId: string): Promise<Program | null> {
+  noStore();
   const notion = notionClient();
   try {
     const page: any = await notion.pages.retrieve({ page_id: programId });
