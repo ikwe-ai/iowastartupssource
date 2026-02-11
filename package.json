@@ -8,9 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "crawl": "node scripts/checkSources.mjs",
+    "crawl": "node scripts/autoAddSuggestions.mjs",
     "audit:links": "node scripts/linkAudit.mjs",
     "audit:fill-priority": "node scripts/fillPriorityReport.mjs",
+    "auto:add-suggestions": "node scripts/autoAddSuggestions.mjs",
+    "auto:check-pending": "node scripts/checkPendingSuggestions.mjs",
     "enrich:programs": "node scripts/enrichPrograms.mjs",
     "schema:suggestions": "node scripts/print-suggestions-schema.mjs",
     "gap:perks": "node scripts/perksGapReport.mjs"

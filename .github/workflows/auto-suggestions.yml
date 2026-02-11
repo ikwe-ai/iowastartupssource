@@ -1,0 +1,40 @@
+name: Auto Add + Check Suggestions (Notion)
+
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  auto-suggestions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Auto-add seed suggestions to Pending
+        run: npm run auto:add-suggestions
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SUGGESTIONS_DB_ID: ${{ secrets.NOTION_SUGGESTIONS_DB_ID }}
+          AUTO_ADD_DRY_RUN: "false"
+          AUTO_ADD_STATUS: "Pending"
+          AUTO_ADD_SEED_FILE: "data/suggestion-seeds.json"
+          AUTO_ADD_SUBMITTER_EMAIL: ${{ secrets.AUTO_ADD_SUBMITTER_EMAIL }}
+
+      - name: Check pending suggestion URLs
+        run: npm run auto:check-pending
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SUGGESTIONS_DB_ID: ${{ secrets.NOTION_SUGGESTIONS_DB_ID }}
+          SUGGESTIONS_CHECK_DRY_RUN: "false"
+          SUGGESTIONS_CHECK_MAX: "200"

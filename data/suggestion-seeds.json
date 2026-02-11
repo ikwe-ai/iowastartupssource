@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Google Cloud Startup Program",
+    "provider": "Google Cloud",
+    "programUrl": "https://cloud.google.com/startup",
+    "evidenceUrl": "https://cloud.google.com/startup",
+    "category": ["Cloud Credits"],
+    "stage": ["MVP", "Pre-seed", "Seed"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "AWS Activate",
+    "provider": "AWS",
+    "programUrl": "https://aws.amazon.com/startups/credits",
+    "evidenceUrl": "https://aws.amazon.com/startups/credits",
+    "category": ["Cloud Credits"],
+    "stage": ["MVP", "Pre-seed", "Seed"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "Sentry for Startups",
+    "provider": "Sentry",
+    "programUrl": "https://sentry.io/for/startups/",
+    "evidenceUrl": "https://sentry.io/for/startups/",
+    "category": ["Developer Tools", "Credits"],
+    "stage": ["MVP", "Pre-seed", "Seed"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "Datadog for Startups",
+    "provider": "Datadog",
+    "programUrl": "https://www.datadoghq.com/startups/",
+    "evidenceUrl": "https://www.datadoghq.com/startups/",
+    "category": ["Developer Tools", "Credits"],
+    "stage": ["MVP", "Pre-seed", "Seed"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "ISU Startup Factory",
+    "provider": "Iowa State University",
+    "programUrl": "https://www.isupjcenter.org/startup-factory",
+    "evidenceUrl": "https://www.isupjcenter.org/startup-factory",
+    "category": ["Accelerator", "Iowa Non-Dilutive"],
+    "stage": ["Idea", "MVP"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "IEDA Innovation Acceleration Fund",
+    "provider": "Iowa Economic Development Authority",
+    "programUrl": "https://opportunityiowa.gov/business/financial-assistance/grants-funding/innovation-acceleration-fund",
+    "evidenceUrl": "https://opportunityiowa.gov/business/financial-assistance/grants-funding/innovation-acceleration-fund",
+    "category": ["Grant", "Iowa Non-Dilutive"],
+    "stage": ["MVP", "Pilot", "Revenue"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  },
+  {
+    "title": "NewBoCo Iowa Startup Accelerator",
+    "provider": "NewBoCo",
+    "programUrl": "https://newbo.co/programs/iowa-startup-accelerator/",
+    "evidenceUrl": "https://newbo.co/programs/iowa-startup-accelerator/",
+    "category": ["Accelerator", "Iowa Non-Dilutive"],
+    "stage": ["MVP", "Pilot", "Revenue"],
+    "suggestionType": "New Program",
+    "notes": "Auto-seeded candidate. Verify current terms before approval."
+  }
+]

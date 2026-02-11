@@ -65,6 +65,38 @@ Optional env vars:
 - `LINK_AUDIT_SET_STATUS_ON_BROKEN=true` to set status when a link fails
 - `LINK_AUDIT_BROKEN_STATUS_VALUE="Needs Review"` status value to write on broken links
 
+## Auto-add + auto-check suggestions (safe mode)
+Automatically add new candidate programs into Suggestions DB as `Pending`, then run health checks on pending URLs.
+This keeps the human approval gate intact before anything is published.
+
+```bash
+# 1) Preview seed ingestion (no writes)
+AUTO_ADD_DRY_RUN=true npm run auto:add-suggestions
+
+# 2) Write seed ingestion to Suggestions DB
+AUTO_ADD_DRY_RUN=false npm run auto:add-suggestions
+
+# 3) Check pending suggestion URLs and annotate Notes
+SUGGESTIONS_CHECK_DRY_RUN=false npm run auto:check-pending
+```
+
+Files:
+- Seed file: `data/suggestion-seeds.json`
+- Ingest script: `scripts/autoAddSuggestions.mjs`
+- Pending checker: `scripts/checkPendingSuggestions.mjs`
+- Scheduled workflow: `.github/workflows/auto-suggestions.yml`
+
+Required GitHub Actions secrets:
+- `NOTION_TOKEN`
+- `NOTION_SUGGESTIONS_DB_ID`
+- `AUTO_ADD_SUBMITTER_EMAIL` (optional)
+
+Important:
+- This flow only creates/updates Suggestions rows.
+- Human review still decides promotion into Programs DB with:
+  - `Status = Active`
+  - `Needs review = unchecked`
+
 ## Suggestions schema helper
 Print Suggestions DB property names/types to map form fields exactly:
 
