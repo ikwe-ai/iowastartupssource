@@ -75,17 +75,17 @@ export default function DirectoryFilters({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <div className="rounded-3xl border bg-white/80 backdrop-blur p-4 shadow-sm">
         <div className="grid gap-2 md:grid-cols-4">
           <input
-            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            className="w-full rounded-2xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
             placeholder="Search (name, provider, category...)"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
 
           <select
-            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            className="w-full rounded-2xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
@@ -96,7 +96,7 @@ export default function DirectoryFilters({
           </select>
 
           <select
-            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            className="w-full rounded-2xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
             value={stage}
             onChange={(e) => setStage(e.target.value)}
           >
@@ -107,7 +107,7 @@ export default function DirectoryFilters({
           </select>
 
           <select
-            className="w-full rounded-xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
+            className="w-full rounded-2xl border bg-white p-2.5 text-sm outline-none focus:ring-2 focus:ring-zinc-200"
             value={sort}
             onChange={(e) => setSort(e.target.value as any)}
           >
@@ -121,7 +121,7 @@ export default function DirectoryFilters({
           </label>
 
           <button
-            className="rounded-xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-2"
+            className="rounded-2xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-2"
             onClick={() => {
               setQ("");
               setCategory("");
@@ -141,7 +141,7 @@ export default function DirectoryFilters({
 
       <div className="grid gap-3">
         {filtered.map((p) => (
-          <Link key={p.id} href={`/program/${p.id}`} className="block rounded-2xl border bg-white p-5 shadow-sm hover:bg-zinc-50">
+          <Link key={p.id} href={`/program/${p.id}`} className="block rounded-3xl border bg-white/80 backdrop-blur p-5 shadow-sm hover:bg-white">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="font-medium">{p.name || "Untitled Program"}</div>

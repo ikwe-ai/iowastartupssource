@@ -10,31 +10,41 @@ export default async function Home({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border bg-white p-8 shadow-sm">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-zinc-600">
-            Iowa ecosystem resource • updated by community
+      <section className="rounded-3xl border bg-white/80 backdrop-blur p-8 shadow-sm overflow-hidden relative">
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-gradient-to-br from-indigo-500/20 to-pink-500/10 blur-2xl" />
+        <div className="absolute -bottom-28 -left-24 h-64 w-64 rounded-full bg-gradient-to-br from-emerald-500/15 to-indigo-500/10 blur-2xl" />
+
+        <div className="relative space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-xs text-zinc-600">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            updated by community • verified entries only
           </div>
 
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Find credits & programs that extend runway
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Iowa’s runway cheat codes.
           </h1>
 
-          <p className="max-w-3xl text-zinc-600">
-            A curated directory of startup credits, perks, accelerators, and non-dilutive programs for Iowa founders.
-            Verified entries only (Active + not flagged for review).
+          <p className="max-w-3xl text-zinc-600 text-lg">
+            A living directory of startup credits, perks, accelerators, and non-dilutive programs.
+            Built to help founders move faster with less burn.
           </p>
 
           <div className="flex flex-wrap gap-3 pt-2">
             <a
               href="/submit"
-              className="rounded-full bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800"
+              className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm text-white hover:bg-zinc-800 shadow-sm"
             >
               Suggest a program
             </a>
             <a
+              href="/?category=LLM%2FAPI%20Credits"
+              className="rounded-full border bg-white px-5 py-2.5 text-sm hover:bg-zinc-50"
+            >
+              Show AI credits
+            </a>
+            <a
               href="/about"
-              className="rounded-full border bg-white px-4 py-2 text-sm hover:bg-zinc-50"
+              className="rounded-full border bg-white px-5 py-2.5 text-sm hover:bg-zinc-50"
             >
               How it works
             </a>
@@ -43,22 +53,25 @@ export default async function Home({
       </section>
 
       <section className="grid gap-3 md:grid-cols-3">
-        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?category=LLM%2FAPI%20Credits">
-          <div className="text-sm text-zinc-500">Stack</div>
+        <a className="rounded-3xl border bg-white/80 backdrop-blur p-6 shadow-sm hover:bg-white" href="/?category=LLM%2FAPI%20Credits">
+          <div className="text-xs text-zinc-500">Stack</div>
           <div className="mt-1 text-lg font-semibold">AI Credits</div>
           <div className="mt-2 text-sm text-zinc-600">LLM/API credits to apply for this week.</div>
+          <div className="mt-4 inline-flex rounded-full bg-zinc-900 px-3 py-1.5 text-xs text-white">Open</div>
         </a>
 
-        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?category=Cloud%20Credits">
-          <div className="text-sm text-zinc-500">Stack</div>
+        <a className="rounded-3xl border bg-white/80 backdrop-blur p-6 shadow-sm hover:bg-white" href="/?category=Cloud%20Credits">
+          <div className="text-xs text-zinc-500">Stack</div>
           <div className="mt-1 text-lg font-semibold">Cloud Runway</div>
           <div className="mt-2 text-sm text-zinc-600">AWS/GCP/Azure + infra perks.</div>
+          <div className="mt-4 inline-flex rounded-full bg-zinc-900 px-3 py-1.5 text-xs text-white">Open</div>
         </a>
 
-        <a className="rounded-2xl border bg-white p-6 shadow-sm hover:bg-zinc-50" href="/?q=VentureNet">
-          <div className="text-sm text-zinc-500">Stack</div>
+        <a className="rounded-3xl border bg-white/80 backdrop-blur p-6 shadow-sm hover:bg-white" href="/?q=VentureNet">
+          <div className="text-xs text-zinc-500">Stack</div>
           <div className="mt-1 text-lg font-semibold">Iowa Non-Dilutive</div>
-          <div className="mt-2 text-sm text-zinc-600">State programs + VentureNet pathways.</div>
+          <div className="mt-2 text-sm text-zinc-600">VentureNet + state ecosystem pathways.</div>
+          <div className="mt-4 inline-flex rounded-full bg-zinc-900 px-3 py-1.5 text-xs text-white">Open</div>
         </a>
       </section>
 
