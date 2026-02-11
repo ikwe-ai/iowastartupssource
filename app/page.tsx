@@ -78,8 +78,14 @@ export default async function Home({
       <section className="space-y-4">
         <div className="flex items-end justify-between gap-4">
           <h2 className="text-xl font-semibold">Directory</h2>
-          <div className="text-sm text-zinc-500">
-            {programs.length} approved entries
+          <div className="flex items-center gap-2">
+            <div className="text-sm text-zinc-500">{programs.length} approved entries</div>
+            <a
+              href="/admin/fill-priority"
+              className="rounded-full border bg-white px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50"
+            >
+              Open fill queue
+            </a>
           </div>
         </div>
 
