@@ -11,9 +11,13 @@ type PriorityRow = {
   whatLen: number;
   eligibilityLen: number;
   applyLen: number;
+  hasApplyUrl: boolean;
+  hasSourceUrl: boolean;
   linkStatus?: string;
   confidence?: string;
   needsReview?: boolean;
+  strictComplete: boolean;
+  strictMissing: string[];
 };
 
 function len(value?: string) {
@@ -50,6 +54,24 @@ function assess(program: Program): PriorityRow {
   if (eligibilityPenalty > 0) gaps.push("Eligibility");
   if (applyPenalty > 0) gaps.push("How to apply");
 
+  const hasApplyUrl = Boolean(String(program.applyUrl || "").trim());
+  const hasSourceUrl = Boolean(String(program.sourceUrl || "").trim());
+  const linkStatus = String(program.linkStatus || "").trim();
+  const confidence = String(program.confidence || "").trim();
+
+  const strictMissing: string[] = [];
+  if (whatLen < 120) strictMissing.push("What you get (>=120 chars)");
+  if (eligibilityLen < 100) strictMissing.push("Eligibility (>=100 chars)");
+  if (applyLen < 90) strictMissing.push("How to apply (>=90 chars)");
+  if (!hasApplyUrl) strictMissing.push("Apply URL");
+  if (!hasSourceUrl) strictMissing.push("Source URL");
+  if (linkStatus !== "OK") strictMissing.push("Link Status = OK");
+  if (program.needsReview) strictMissing.push("Needs review unchecked");
+  if (confidence !== "High") strictMissing.push("Confidence = High");
+  if (String(program.status || "") !== "Active") strictMissing.push("Status = Active");
+
+  const strictComplete = strictMissing.length === 0;
+
   return {
     id: program.id,
     name: program.name || "Untitled",
@@ -60,10 +82,18 @@ function assess(program: Program): PriorityRow {
     whatLen,
     eligibilityLen,
     applyLen,
+    hasApplyUrl,
+    hasSourceUrl,
     linkStatus: program.linkStatus,
     confidence: program.confidence,
     needsReview: program.needsReview,
+    strictComplete,
+    strictMissing,
   };
+}
+
+function notionEditUrl(pageId: string) {
+  return `https://www.notion.so/${pageId.replace(/-/g, "")}`;
 }
 
 export const dynamic = "force-dynamic";
@@ -72,7 +102,12 @@ export default async function FillPriorityPage() {
   const programs = await listPrograms();
   const scored = programs.map(assess).sort((a, b) => b.priority - a.priority || a.name.localeCompare(b.name));
   const needFill = scored.filter((r) => r.readiness < 3);
+  const strictQueue = scored
+    .filter((r) => !r.strictComplete)
+    .sort((a, b) => b.strictMissing.length - a.strictMissing.length || b.priority - a.priority || a.name.localeCompare(b.name))
+    .slice(0, 20);
   const readyCount = scored.length - needFill.length;
+  const strictReady = scored.filter((r) => r.strictComplete).length;
 
   return (
     <div className="space-y-5">
@@ -99,6 +134,60 @@ export default async function FillPriorityPage() {
           <span className="rounded-full bg-zinc-100 px-3 py-1">Total: {scored.length}</span>
           <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-900">Need fill: {needFill.length}</span>
           <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-900">Ready: {readyCount}</span>
+          <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-900">Strict complete: {strictReady}</span>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold">Top 20 to complete (strict checks)</h2>
+          <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700">Hard gate quality queue</span>
+        </div>
+        <p className="mb-4 text-sm text-zinc-600">
+          Strict completion requires: strong value text, strong eligibility, strong apply steps, apply/source links, link status OK, confidence High, status Active, and review unchecked.
+        </p>
+        <div className="grid gap-3">
+          {strictQueue.map((row, idx) => (
+            <div key={row.id} className="rounded-xl border bg-white p-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="text-xs text-zinc-500">#{idx + 1} priority</div>
+                  <div className="font-medium">{row.name}</div>
+                  <div className="text-xs text-zinc-600">{row.provider}</div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-900">readiness {row.readiness}/3</span>
+                  <span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-900">{row.strictMissing.length} strict gaps</span>
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {row.strictMissing.map((m) => (
+                  <span key={m} className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs text-zinc-700">
+                    {m}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href={`/program/${row.id}`} className="rounded-full border px-3 py-1 text-xs hover:bg-zinc-50">
+                  Open entry
+                </Link>
+                <a
+                  href={notionEditUrl(row.id)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border px-3 py-1 text-xs hover:bg-zinc-50"
+                >
+                  Edit in Notion
+                </a>
+                <Link
+                  href={`/submit?suggestionType=Update%20Existing&relatedProgramId=${encodeURIComponent(row.id)}&title=${encodeURIComponent(row.name)}`}
+                  className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-white hover:bg-zinc-800"
+                >
+                  Submit structured update
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
