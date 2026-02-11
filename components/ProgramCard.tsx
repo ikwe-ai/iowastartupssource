@@ -10,8 +10,12 @@ type Program = {
   stage?: string[];
   founderSnapshot?: string;
   whatYouGet?: string;
+  eligibilitySummary?: string;
+  howToApply?: string;
   autoSummary?: string;
   notes?: string;
+  offerType?: string;
+  valueUsdEst?: number;
   linkStatus?: string;
   lastVerifiedAt?: string;
   status?: string;
@@ -33,9 +37,24 @@ function statusDot(status?: string) {
   return "bg-zinc-400";
 }
 
+function oneLine(text?: string, max = 120) {
+  const clean = String(text || "").replace(/\s+/g, " ").trim();
+  if (!clean) return "";
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, max - 1).trimEnd()}…`;
+}
+
 export default function ProgramCard({ p }: { p: Program }) {
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
   const summary = (p.founderSnapshot || p.whatYouGet || p.autoSummary || p.notes || "").trim();
+  const valueLine = oneLine(
+    p.whatYouGet ||
+      (typeof p.valueUsdEst === "number" ? `Estimated value: $${p.valueUsdEst.toLocaleString()}` : "") ||
+      (p.offerType ? `${p.offerType} program for startups.` : ""),
+    150,
+  );
+  const qualifyLine = oneLine(p.eligibilitySummary || "", 140);
+  const applyLine = oneLine(p.howToApply || "", 140);
   const ago = daysAgo(p.lastVerifiedAt);
 
   return (
@@ -76,11 +95,33 @@ export default function ProgramCard({ p }: { p: Program }) {
           ))}
         </div>
 
-        {summary ? (
-          <p className="mt-4 line-clamp-2 text-sm text-zinc-800">{summary}</p>
-        ) : (
-          <p className="mt-4 text-sm italic text-zinc-500">No summary yet - suggest an update.</p>
-        )}
+        <div className="mt-4 space-y-2 text-sm">
+          {valueLine ? (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">What you get</div>
+              <p className="text-zinc-900">{valueLine}</p>
+            </div>
+          ) : null}
+          {qualifyLine ? (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">Who it&apos;s for</div>
+              <p className="text-zinc-800">{qualifyLine}</p>
+            </div>
+          ) : null}
+          {applyLine ? (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">How to apply</div>
+              <p className="text-zinc-800">{applyLine}</p>
+            </div>
+          ) : null}
+          {!valueLine && !qualifyLine && !applyLine ? (
+            summary ? (
+              <p className="line-clamp-2 text-zinc-800">{oneLine(summary, 180)}</p>
+            ) : (
+              <p className="italic text-zinc-500">No summary yet - suggest an update.</p>
+            )
+          ) : null}
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3 px-5 pb-5">
@@ -91,15 +132,15 @@ export default function ProgramCard({ p }: { p: Program }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/program/${p.id}`} className="rounded-full border border-zinc-200 px-4 py-2 text-sm hover:bg-zinc-50">
-            Details
+          <Link href={`/program/${p.id}`} className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90">
+            Read details
           </Link>
           {p.applyUrl ? (
             <a
               href={p.applyUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90"
+              className="rounded-full border border-zinc-200 px-4 py-2 text-sm hover:bg-zinc-50"
             >
               Apply
             </a>

@@ -10,6 +10,7 @@ export type Program = {
   name: string;
   provider: string;
   category: string[];
+  founderSnapshot?: string;
   whatYouGet?: string;
   howToApply?: string;
   offerType?: string;
@@ -249,6 +250,12 @@ export async function listPrograms(): Promise<Program[]> {
       sourceSummary: textFromRich(props["Source Summary"]) || textFromRich(props["Summary"]) || textFromRich(props["Description"]),
       autoSummary: textFromRich(props["Auto summary"]) || textFromRich(props["Auto Summary"]),
       notes: textFromRich(props["Notes"]),
+      founderSnapshot:
+        textFromRich(props["Founder Snapshot"]) ||
+        textFromRich(props["What you get"]) ||
+        textFromRich(props["Source Summary"]) ||
+        textFromRich(props["Auto summary"]) ||
+        textFromRich(props["Notes"]),
       linkStatus:
         selectName(props["Link Status"]) ??
         statusName(props["Link Status"]) ??
@@ -294,6 +301,12 @@ export async function getProgram(programId: string): Promise<Program | null> {
       sourceSummary: textFromRich(props["Source Summary"]) || textFromRich(props["Summary"]) || textFromRich(props["Description"]),
       autoSummary: textFromRich(props["Auto summary"]) || textFromRich(props["Auto Summary"]),
       notes: textFromRich(props["Notes"]),
+      founderSnapshot:
+        textFromRich(props["Founder Snapshot"]) ||
+        textFromRich(props["What you get"]) ||
+        textFromRich(props["Source Summary"]) ||
+        textFromRich(props["Auto summary"]) ||
+        textFromRich(props["Notes"]),
       linkStatus:
         selectName(props["Link Status"]) ??
         statusName(props["Link Status"]) ??

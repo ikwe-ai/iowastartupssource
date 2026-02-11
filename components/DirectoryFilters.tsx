@@ -9,12 +9,16 @@ type Program = {
   name: string;
   provider: string;
   category: string[];
+  founderSnapshot?: string;
   whatYouGet?: string;
+  eligibilitySummary?: string;
+  howToApply?: string;
   autoSummary?: string;
   notes?: string;
   stage?: string[];
   geo?: string;
   valueUsdEst?: number;
+  offerType?: string;
   applyUrl?: string;
   linkStatus?: string;
   lastVerifiedAt?: string;
