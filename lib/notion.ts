@@ -188,57 +188,29 @@ export async function listPrograms(): Promise<Program[]> {
   const notion = notionClient();
   const dbId = reqEnv("NOTION_PROGRAMS_DB_ID", NOTION_PROGRAMS_DB_ID);
 
-  const dbSchema: any = await notion.databases.retrieve({ database_id: dbId });
-  const schemaProps = dbSchema?.properties ?? {};
-
-  const statusProp =
-    pickExistingProperty(schemaProps, ["Status"], "status") ??
-    pickExistingProperty(schemaProps, ["Status"], "select");
-  const statusType = statusProp ? schemaProps[statusProp]?.type : undefined;
-  const reviewProp = pickExistingProperty(schemaProps, [
-    "Needs Review",
-    "Needs review",
-    "NeedsReview",
-    "Review Needed",
-    "Needs QA",
-  ], "checkbox");
-
-  const filters: any[] = [];
-  if (statusProp && statusType === "status") {
-    filters.push({
-      property: statusProp,
-      status: { equals: "Active" },
-    });
-  } else if (statusProp && statusType === "select") {
-    filters.push({
-      property: statusProp,
-      select: { equals: "Active" },
-    });
-  }
-  if (reviewProp) {
-    filters.push({
-      property: reviewProp,
-      checkbox: { equals: false },
-    });
-  }
-
   const resp = await notion.databases.query({
     database_id: dbId,
     page_size: 200,
-    ...(filters.length === 0
-      ? {}
-      : filters.length === 1
-        ? { filter: filters[0] }
-        : { filter: { and: filters } }),
+    filter: {
+      and: [
+        {
+          property: "Status",
+          status: { equals: "Active" },
+        },
+        {
+          property: "Needs review",
+          checkbox: { equals: false },
+        },
+      ],
+    },
   });
 
   return resp.results.map((page: any) => {
     const props = page.properties ?? {};
-    // Match these property names to your Notion database fields
-    const name = textFromTitle(props["Program Name"] ?? props["Name"] ?? props["Program"]);
+    const name = textFromTitle(props["Name"]);
     const provider = selectName(props["Provider"]) ?? textFromRich(props["Provider"]) ?? "Unknown";
     const category = multiSelectNames(props["Category"]);
-    const stage = multiSelectNames(props["Best For Stage"]) || multiSelectNames(props["Stage"]);
+    const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
     return {
       id: page.id,
       name,
@@ -253,15 +225,10 @@ export async function listPrograms(): Promise<Program[]> {
       applyUrl: url(props["Application Link"]) ?? url(props["Apply URL"]),
       sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      status: statusName(props["Status"]) ?? selectName(props["Status"]) ?? textFromRich(props["Status"]),
+      status: statusName(props["Status"]),
       confidence: selectName(props["Confidence"]) ?? textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
-      needsReview:
-        checkbox(props["Needs Review"]) ??
-        checkbox(props["Needs review"]) ??
-        checkbox(props["NeedsReview"]) ??
-        checkbox(props["Review Needed"]) ??
-        checkbox(props["Needs QA"]),
+      needsReview: checkbox(props["Needs review"]),
     };
   });
 }
@@ -271,10 +238,10 @@ export async function getProgram(programId: string): Promise<Program | null> {
   try {
     const page: any = await notion.pages.retrieve({ page_id: programId });
     const props = page.properties ?? {};
-    const name = textFromTitle(props["Program Name"] ?? props["Name"] ?? props["Program"]);
+    const name = textFromTitle(props["Name"]);
     const provider = selectName(props["Provider"]) ?? textFromRich(props["Provider"]) ?? "Unknown";
     const category = multiSelectNames(props["Category"]);
-    const stage = multiSelectNames(props["Best For Stage"]) || multiSelectNames(props["Stage"]);
+    const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
     return {
       id: page.id,
       name,
@@ -289,15 +256,10 @@ export async function getProgram(programId: string): Promise<Program | null> {
       applyUrl: url(props["Application Link"]) ?? url(props["Apply URL"]),
       sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      status: statusName(props["Status"]) ?? selectName(props["Status"]) ?? textFromRich(props["Status"]),
+      status: statusName(props["Status"]),
       confidence: selectName(props["Confidence"]) ?? textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
-      needsReview:
-        checkbox(props["Needs Review"]) ??
-        checkbox(props["Needs review"]) ??
-        checkbox(props["NeedsReview"]) ??
-        checkbox(props["Review Needed"]) ??
-        checkbox(props["Needs QA"]),
+      needsReview: checkbox(props["Needs review"]),
     };
   } catch {
     return null;
