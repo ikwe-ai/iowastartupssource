@@ -44,12 +44,24 @@ export default function DirectoryFilters({
   const [stage, setStage] = useState(initialStage);
   const [onlyIowa, setOnlyIowa] = useState(false);
   const [savedOnly, setSavedOnly] = useState(false);
-  const [sort, setSort] = useState<"provider" | "value">("provider");
+  const [needsDetailsOnly, setNeedsDetailsOnly] = useState(false);
+  const [sort, setSort] = useState<"provider" | "value" | "readiness">("readiness");
   const [savedIds, setSavedIds] = useState<string[]>([]);
-  const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : "", savedOnly ? "saved" : ""].filter(Boolean).length;
+  const activeFilterCount = [q.trim(), category, stage, onlyIowa ? "iowa" : "", savedOnly ? "saved" : "", needsDetailsOnly ? "needs" : ""].filter(Boolean).length;
 
   function onSortChange(v: string) {
-    setSort(v === "value" ? "value" : "provider");
+    if (v === "value" || v === "provider" || v === "readiness") {
+      setSort(v);
+      return;
+    }
+    setSort("readiness");
+  }
+
+  function readinessScore(p: Program) {
+    const what = String(p.whatYouGet || "").trim().length >= 60 ? 1 : 0;
+    const elig = String(p.eligibilitySummary || "").trim().length >= 50 ? 1 : 0;
+    const apply = String(p.howToApply || "").trim().length >= 45 ? 1 : 0;
+    return what + elig + apply;
   }
 
   useEffect(() => {
@@ -101,6 +113,7 @@ export default function DirectoryFilters({
         if (!g.includes("iowa")) return false;
       }
       if (savedOnly && !savedIds.includes(p.id)) return false;
+      if (needsDetailsOnly && readinessScore(p) >= 3) return false;
 
       if (query) {
         const hay = `${p.name} ${p.provider} ${(p.category || []).join(" ")} ${(p.stage || []).join(" ")} ${p.whatYouGet || ""} ${p.eligibilitySummary || ""} ${p.howToApply || ""} ${p.sourceSummary || ""} ${p.autoSummary || ""}`.toLowerCase();
@@ -112,12 +125,16 @@ export default function DirectoryFilters({
 
     if (sort === "value") {
       out = out.sort((a, b) => (b.valueUsdEst || 0) - (a.valueUsdEst || 0));
+    } else if (sort === "readiness") {
+      out = out.sort((a, b) => readinessScore(a) - readinessScore(b) || (a.provider || "").localeCompare(b.provider || "") || a.name.localeCompare(b.name));
     } else {
       out = out.sort((a, b) => (a.provider || "").localeCompare(b.provider || "") || a.name.localeCompare(b.name));
     }
 
     return out;
-  }, [programs, q, category, stage, onlyIowa, savedOnly, savedIds, sort]);
+  }, [programs, q, category, stage, onlyIowa, savedOnly, needsDetailsOnly, savedIds, sort]);
+
+  const needsFillCount = useMemo(() => programs.filter((p) => readinessScore(p) < 3).length, [programs]);
 
   return (
     <div className="space-y-4">
@@ -159,6 +176,7 @@ export default function DirectoryFilters({
           >
             <option value="provider">Sort: Provider A→Z</option>
             <option value="value">Sort: Value high→low</option>
+            <option value="readiness">Sort: Needs details first</option>
           </select>
 
           <label className="flex items-center gap-2 text-sm md:col-span-2">
@@ -171,15 +189,21 @@ export default function DirectoryFilters({
             Saved only
           </label>
 
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <input type="checkbox" checked={needsDetailsOnly} onChange={(e) => setNeedsDetailsOnly(e.target.checked)} />
+            Needs details only
+          </label>
+
           <button
-            className="rounded-2xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-4"
+            className="rounded-2xl border bg-white px-3 py-2 text-sm hover:bg-zinc-50 md:col-span-2"
             onClick={() => {
               setQ("");
               setCategory("");
               setStage("");
               setOnlyIowa(false);
               setSavedOnly(false);
-              setSort("provider");
+              setNeedsDetailsOnly(false);
+              setSort("readiness");
             }}
           >
             Reset
@@ -189,6 +213,9 @@ export default function DirectoryFilters({
 
       <div className="text-sm opacity-80">
         Showing <span className="font-medium">{filtered.length}</span> programs
+        <span className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-800">
+          {needsFillCount} need details
+        </span>
         {activeFilterCount > 0 && (
           <span className="ml-2 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
             {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active

@@ -48,6 +48,10 @@ function oneLine(text?: string, max = 120) {
   return `${clean.slice(0, max - 1).trimEnd()}…`;
 }
 
+function hasUsefulContent(text?: string, minLen = 40) {
+  return String(text || "").trim().length >= minLen;
+}
+
 export default function ProgramCard({
   p,
   isSaved = false,
@@ -59,16 +63,22 @@ export default function ProgramCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
-  const summary = (p.founderSnapshot || p.whatYouGet || p.sourceSummary || p.autoSummary || p.notes || "").trim();
   const valueLine = oneLine(
     p.whatYouGet ||
+      p.founderSnapshot ||
+      p.sourceSummary ||
+      p.autoSummary ||
       (typeof p.valueUsdEst === "number" ? `Estimated value: $${p.valueUsdEst.toLocaleString()}` : "") ||
       (p.offerType ? `${p.offerType} program for startups.` : ""),
     220,
   );
   const qualifyLine = oneLine(p.eligibilitySummary || "", 200);
-  const applyLine = oneLine(p.howToApply || "", 200);
+  const applyLine = oneLine(p.howToApply || p.notes || "", 200);
   const ago = daysAgo(p.lastVerifiedAt);
+  const valueReady = hasUsefulContent(p.whatYouGet, 60);
+  const eligibilityReady = hasUsefulContent(p.eligibilitySummary, 50);
+  const applyReady = hasUsefulContent(p.howToApply, 45);
+  const readiness = [valueReady, eligibilityReady, applyReady].filter(Boolean).length;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:shadow-md">
@@ -106,6 +116,13 @@ export default function ProgramCard({
               {s}
             </span>
           ))}
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${
+              readiness === 3 ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-amber-300 bg-amber-50 text-amber-800"
+            }`}
+          >
+            Profile {readiness}/3
+          </span>
         </div>
 
         <div className="mt-4 space-y-2 text-sm">
@@ -114,27 +131,34 @@ export default function ProgramCard({
               <div className="text-xs font-medium text-zinc-500">What you get</div>
               <p className="text-zinc-900">{valueLine}</p>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">What you get</div>
+              <p className="italic text-zinc-500">Missing - needs enrichment</p>
+            </div>
+          )}
           {qualifyLine ? (
             <div>
               <div className="text-xs font-medium text-zinc-500">Who it&apos;s for</div>
               <p className="text-zinc-800">{qualifyLine}</p>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">Who it&apos;s for</div>
+              <p className="italic text-zinc-500">Missing - needs enrichment</p>
+            </div>
+          )}
           {applyLine ? (
             <div>
               <div className="text-xs font-medium text-zinc-500">How to apply</div>
               <p className="text-zinc-800">{applyLine}</p>
             </div>
-          ) : null}
-          {!valueLine && !qualifyLine && !applyLine ? (
-            summary ? (
-              <p className="text-zinc-800">{oneLine(summary, 240)}</p>
-            ) : (
-              <p className="italic text-zinc-500">No summary yet - suggest an update.</p>
-            )
-          ) : null}
-
+          ) : (
+            <div>
+              <div className="text-xs font-medium text-zinc-500">How to apply</div>
+              <p className="italic text-zinc-500">Missing - needs enrichment</p>
+            </div>
+          )}
           {(p.eligibilitySummary || p.howToApply) && (
             <button
               type="button"
@@ -186,19 +210,21 @@ export default function ProgramCard({
           <Link href={`/program/${p.id}`} className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90">
             Read details
           </Link>
-          {p.applyUrl ? (
+          {expanded && p.applyUrl ? (
             <a
               href={p.applyUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-zinc-200 px-4 py-2 text-sm hover:bg-zinc-50"
+              className="rounded-full border border-zinc-200 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
             >
               Apply
             </a>
           ) : (
-            <Link href="/submit" className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90">
-              Add link
-            </Link>
+            expanded ? (
+              <Link href="/submit" className="rounded-full border border-zinc-200 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
+                Add link
+              </Link>
+            ) : null
           )}
         </div>
       </div>
