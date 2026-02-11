@@ -1,16 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import ProgramCard from "@/components/ProgramCard";
 
 type Program = {
   id: string;
   name: string;
   provider: string;
   category: string[];
+  whatYouGet?: string;
   stage?: string[];
   geo?: string;
   valueUsdEst?: number;
+  applyUrl?: string;
+  linkStatus?: string;
+  lastVerifiedAt?: string;
+  status?: string;
   requiresReferral?: boolean;
   needsReview?: boolean;
 };
@@ -165,26 +170,7 @@ export default function DirectoryFilters({
       ) : (
         <div className="grid gap-3">
           {filtered.map((p) => (
-            <Link key={p.id} href={`/program/${p.id}`} className="block rounded-3xl border bg-white/80 backdrop-blur p-5 shadow-sm hover:bg-white">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-medium">{p.name || "Untitled Program"}</div>
-                  <div className="text-sm opacity-80">{p.provider}</div>
-
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    {(p.category || []).slice(0, 4).map((c) => (
-                      <span key={c} className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700">{c}</span>
-                    ))}
-                    {p.requiresReferral && <span className="rounded-full border px-2 py-1">Referral</span>}
-                    {p.geo && <span className="rounded-full border px-2 py-1">{p.geo}</span>}
-                  </div>
-                </div>
-
-                <div className="text-sm opacity-80 text-right">
-                  {typeof p.valueUsdEst === "number" ? `$${p.valueUsdEst.toLocaleString()}` : ""}
-                </div>
-              </div>
-            </Link>
+            <ProgramCard key={p.id} p={p} />
           ))}
         </div>
       )}

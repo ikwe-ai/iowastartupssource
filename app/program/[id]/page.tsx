@@ -13,8 +13,46 @@ export default async function ProgramDetail({ params }: { params: { id: string }
       </Link>
 
       <div className="rounded-3xl border bg-white/80 p-6 shadow-sm backdrop-blur">
-        <h1 className="text-3xl font-semibold tracking-tight">{p.name || "Untitled Program"}</h1>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {p.status === "Active" && !p.needsReview ? (
+            <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-medium">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Verified entry
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full border px-3 py-1 text-zinc-600">
+              Community entry
+            </span>
+          )}
+          {p.linkStatus && <span className="text-zinc-600">Link: {p.linkStatus}</span>}
+          {p.lastVerifiedAt && <span className="text-zinc-600">• checked {p.lastVerifiedAt}</span>}
+        </div>
+
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight">{p.name || "Untitled Program"}</h1>
         <div className="mt-1 text-zinc-600">{p.provider}</div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {p.applyUrl && (
+            <a
+              href={p.applyUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-90"
+            >
+              Apply
+            </a>
+          )}
+          {p.sourceUrl && (
+            <a
+              href={p.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border px-4 py-2 text-sm hover:bg-zinc-50"
+            >
+              Official source
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 text-xs">
@@ -29,7 +67,7 @@ export default async function ProgramDetail({ params }: { params: { id: string }
 
       {(p.valueUsdEst || p.offerType || p.stage?.length || p.lastVerifiedAt || p.linkStatus || typeof p.httpStatus === "number") && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
-          <div className="mb-3 text-sm font-medium text-zinc-700">Program details</div>
+          <div className="mb-3 text-sm font-medium text-zinc-700">Founder snapshot</div>
           <div className="grid gap-2 text-sm sm:grid-cols-2">
             {p.offerType && <div><span className="font-medium">Type:</span> {p.offerType}</div>}
             {typeof p.valueUsdEst === "number" && <div><span className="font-medium">Estimated value:</span> ${p.valueUsdEst.toLocaleString()}</div>}
@@ -50,7 +88,7 @@ export default async function ProgramDetail({ params }: { params: { id: string }
 
       {p.eligibilitySummary && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
-          <div className="font-medium mb-1">Eligibility</div>
+          <div className="font-medium mb-1">Who it's for</div>
           <div className="opacity-90">{p.eligibilitySummary}</div>
         </div>
       )}
@@ -63,16 +101,16 @@ export default async function ProgramDetail({ params }: { params: { id: string }
       )}
 
       <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
-        <div className="mb-3 text-sm font-medium text-zinc-700">Program links</div>
+        <div className="mb-3 text-sm font-medium text-zinc-700">Verification</div>
         <div className="grid gap-2">
         {p.applyUrl && (
           <a className="underline" href={p.applyUrl} target="_blank" rel="noreferrer">
-            Apply / program page
+            Apply URL
           </a>
         )}
         {p.sourceUrl && (
           <a className="underline" href={p.sourceUrl} target="_blank" rel="noreferrer">
-            Source
+            Source URL
           </a>
         )}
         {p.finalUrl && p.finalUrl !== p.applyUrl && (
