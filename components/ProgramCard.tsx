@@ -79,10 +79,32 @@ export default function ProgramCard({
   const eligibilityReady = hasUsefulContent(p.eligibilitySummary, 50);
   const applyReady = hasUsefulContent(p.howToApply, 45);
   const readiness = [valueReady, eligibilityReady, applyReady].filter(Boolean).length;
+  const detailsId = `program-quick-view-${p.id}`;
+
+  function toggleExpanded() {
+    setExpanded((v) => !v);
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:shadow-md">
-      <div className="p-5">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest("a,button,input,select,textarea,label")) return;
+          toggleExpanded();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleExpanded();
+          }
+        }}
+        aria-expanded={expanded}
+        aria-controls={detailsId}
+        className="block w-full cursor-pointer p-5 text-left"
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate text-lg font-semibold leading-snug">
@@ -160,17 +182,13 @@ export default function ProgramCard({
             </div>
           )}
           {(p.eligibilitySummary || p.howToApply) && (
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="mt-1 inline-flex rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
-            >
+            <span className="mt-1 inline-flex rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-700">
               {expanded ? "Hide quick view" : "Quick view"}
-            </button>
+            </span>
           )}
 
           {expanded && (
-            <div className="mt-2 grid gap-2 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3 text-xs">
+            <div id={detailsId} className="mt-2 grid gap-2 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3 text-xs">
               {p.eligibilitySummary && (
                 <div>
                   <div className="font-medium text-zinc-600">Eligibility</div>
