@@ -27,6 +27,20 @@ export default async function ProgramDetail({ params }: { params: { id: string }
         {p.needsReview && <span className="rounded-full border px-2 py-1">Needs review</span>}
       </div>
 
+      {(p.valueUsdEst || p.offerType || p.stage?.length || p.lastVerifiedAt || p.linkStatus || typeof p.httpStatus === "number") && (
+        <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
+          <div className="mb-3 text-sm font-medium text-zinc-700">Program details</div>
+          <div className="grid gap-2 text-sm sm:grid-cols-2">
+            {p.offerType && <div><span className="font-medium">Type:</span> {p.offerType}</div>}
+            {typeof p.valueUsdEst === "number" && <div><span className="font-medium">Estimated value:</span> ${p.valueUsdEst.toLocaleString()}</div>}
+            {!!p.stage?.length && <div><span className="font-medium">Stage:</span> {p.stage.join(", ")}</div>}
+            {p.lastVerifiedAt && <div><span className="font-medium">Last verified:</span> {p.lastVerifiedAt}</div>}
+            {p.linkStatus && <div><span className="font-medium">Link status:</span> {p.linkStatus}</div>}
+            {typeof p.httpStatus === "number" && <div><span className="font-medium">HTTP status:</span> {p.httpStatus}</div>}
+          </div>
+        </div>
+      )}
+
       {p.whatYouGet && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
           <div className="font-medium mb-1">What you get</div>
@@ -38,6 +52,13 @@ export default async function ProgramDetail({ params }: { params: { id: string }
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
           <div className="font-medium mb-1">Eligibility</div>
           <div className="opacity-90">{p.eligibilitySummary}</div>
+        </div>
+      )}
+
+      {p.howToApply && (
+        <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
+          <div className="font-medium mb-1">How to apply</div>
+          <div className="opacity-90">{p.howToApply}</div>
         </div>
       )}
 
@@ -54,8 +75,39 @@ export default async function ProgramDetail({ params }: { params: { id: string }
             Source
           </a>
         )}
+        {p.finalUrl && p.finalUrl !== p.applyUrl && (
+          <a className="underline" href={p.finalUrl} target="_blank" rel="noreferrer">
+            Final destination URL
+          </a>
+        )}
         </div>
       </div>
+
+      {(p.sourceSummary || p.autoSummary || p.notes) && (
+        <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
+          <div className="mb-3 text-sm font-medium text-zinc-700">Source notes</div>
+          <div className="grid gap-3 text-sm text-zinc-700">
+            {p.sourceSummary && (
+              <div>
+                <div className="font-medium">Source summary</div>
+                <div className="opacity-90">{p.sourceSummary}</div>
+              </div>
+            )}
+            {p.autoSummary && (
+              <div>
+                <div className="font-medium">Auto summary</div>
+                <div className="opacity-90">{p.autoSummary}</div>
+              </div>
+            )}
+            {p.notes && (
+              <div>
+                <div className="font-medium">Notes</div>
+                <div className="opacity-90">{p.notes}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
         <div className="font-medium mb-2">Suggest an update</div>
