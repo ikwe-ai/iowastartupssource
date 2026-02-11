@@ -72,22 +72,49 @@ export async function listPrograms(): Promise<Program[]> {
   const notion = notionClient();
   const dbId = reqEnv("NOTION_PROGRAMS_DB_ID", NOTION_PROGRAMS_DB_ID);
 
-  const resp = await notion.databases.query({
+  const baseQuery = {
     database_id: dbId,
-    page_size: 200,
-    filter: {
-      and: [
-        {
-          property: "Status",
-          select: { equals: "Active" },
-        },
-        {
-          property: "Needs Review",
-          checkbox: { equals: false },
-        },
-      ],
-    },
-  });
+    page_size: 200 as const,
+  };
+
+  let resp: any;
+  try {
+    resp = await notion.databases.query({
+      ...baseQuery,
+      filter: {
+        and: [
+          {
+            property: "Status",
+            status: { equals: "Active" },
+          },
+          {
+            property: "Needs Review",
+            checkbox: { equals: false },
+          },
+        ],
+      },
+    });
+  } catch (err: any) {
+    const message = String(err?.message || "");
+    const isStatusTypeMismatch = message.includes("database property status does not match filter status");
+    if (!isStatusTypeMismatch) throw err;
+
+    resp = await notion.databases.query({
+      ...baseQuery,
+      filter: {
+        and: [
+          {
+            property: "Status",
+            select: { equals: "Active" },
+          },
+          {
+            property: "Needs Review",
+            checkbox: { equals: false },
+          },
+        ],
+      },
+    });
+  }
 
   return resp.results.map((page: any) => {
     const props = page.properties ?? {};
