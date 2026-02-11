@@ -2,6 +2,7 @@ import Link from "next/link";
 
 type Program = {
   id: string;
+  programId?: string;
   name: string;
   provider?: string;
   applyUrl?: string;
@@ -9,6 +10,8 @@ type Program = {
   stage?: string[];
   founderSnapshot?: string;
   whatYouGet?: string;
+  autoSummary?: string;
+  notes?: string;
   linkStatus?: string;
   lastVerifiedAt?: string;
   status?: string;
@@ -32,7 +35,7 @@ function statusDot(status?: string) {
 
 export default function ProgramCard({ p }: { p: Program }) {
   const verified = String(p.status || "").toLowerCase() === "active" && !p.needsReview;
-  const summary = (p.founderSnapshot || p.whatYouGet || "").trim();
+  const summary = (p.founderSnapshot || p.whatYouGet || p.autoSummary || p.notes || "").trim();
   const ago = daysAgo(p.lastVerifiedAt);
 
   return (
@@ -110,4 +113,3 @@ export default function ProgramCard({ p }: { p: Program }) {
     </div>
   );
 }
-

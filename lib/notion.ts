@@ -6,6 +6,7 @@ const NOTION_SUGGESTIONS_DB_ID = process.env.NOTION_SUGGESTIONS_DB_ID;
 
 export type Program = {
   id: string;
+  programId?: string;
   name: string;
   provider: string;
   category: string[];
@@ -229,23 +230,24 @@ export async function listPrograms(): Promise<Program[]> {
     const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
     return {
       id: page.id,
+      programId: textFromRich(props["Program ID"]),
       name,
       provider,
       category,
-      whatYouGet: textFromRich(props["What you get"]) ?? textFromRich(props["Offer Summary"]) ?? textFromRich(props["Offer"]),
-      howToApply: textFromRich(props["How to apply"]) ?? textFromRich(props["How To Apply"]) ?? textFromRich(props["Application Steps"]),
+      whatYouGet: textFromRich(props["What you get"]) || textFromRich(props["Offer Summary"]) || textFromRich(props["Offer"]),
+      howToApply: textFromRich(props["How to apply"]) || textFromRich(props["How To Apply"]) || textFromRich(props["Application Steps"]),
       offerType: selectName(props["Offer Type"]) ?? textFromRich(props["Offer Type"]),
       valueUsdEst: number(props["Value (USD est.)"]) ?? number(props["Value"]),
-      eligibilitySummary: textFromRich(props["Eligibility Summary"]) ?? textFromRich(props["Eligibility"]),
+      eligibilitySummary: textFromRich(props["Eligibility"]) || textFromRich(props["Eligibility Summary"]),
       requiresReferral: checkbox(props["Requires VC/Accelerator Referral"]) ?? checkbox(props["Requires Referral"]),
       geo: selectName(props["Geo Restrictions"]) ?? textFromRich(props["Geo"]),
       stage,
-      applyUrl: url(props["Apply URL"]) ?? url(props["Application Link"]) ?? url(props["Program URL"]),
-      sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
-      finalUrl: url(props["Final URL"]) ?? textFromRich(props["Final URL"]),
+      applyUrl: url(props["Apply URL"]) || url(props["Application Link"]) || url(props["Program URL"]),
+      sourceUrl: url(props["Source URL"]) || url(props["Source"]),
+      finalUrl: url(props["Final URL"]) || textFromRich(props["Final URL"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      sourceSummary: textFromRich(props["Source Summary"]) ?? textFromRich(props["Summary"]) ?? textFromRich(props["Description"]),
-      autoSummary: textFromRich(props["Auto summary"]) ?? textFromRich(props["Auto Summary"]),
+      sourceSummary: textFromRich(props["Source Summary"]) || textFromRich(props["Summary"]) || textFromRich(props["Description"]),
+      autoSummary: textFromRich(props["Auto summary"]) || textFromRich(props["Auto Summary"]),
       notes: textFromRich(props["Notes"]),
       linkStatus:
         selectName(props["Link Status"]) ??
@@ -254,10 +256,8 @@ export async function listPrograms(): Promise<Program[]> {
       httpStatus: number(props["HTTP Status"]) ?? numberFromRich(props["HTTP Status"]),
       status: statusName(props["Status"]),
       confidence:
-        selectName(props["Extraction confidence"]) ??
-        selectName(props["Confidence"]) ??
-        textFromRich(props["Extraction confidence"]) ??
-        textFromRich(props["Confidence"]),
+        selectName(props["Extraction confidence"]) || textFromRich(props["Extraction confidence"]) ||
+        selectName(props["Confidence"]) || textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
       needsReview: checkbox(props["Needs review"]),
     };
@@ -275,23 +275,24 @@ export async function getProgram(programId: string): Promise<Program | null> {
     const stage = multiSelectNames(props["Stage"]) || multiSelectNames(props["Best For Stage"]);
     return {
       id: page.id,
+      programId: textFromRich(props["Program ID"]),
       name,
       provider,
       category,
-      whatYouGet: textFromRich(props["What you get"]) ?? textFromRich(props["Offer Summary"]) ?? textFromRich(props["Offer"]),
-      howToApply: textFromRich(props["How to apply"]) ?? textFromRich(props["How To Apply"]) ?? textFromRich(props["Application Steps"]),
+      whatYouGet: textFromRich(props["What you get"]) || textFromRich(props["Offer Summary"]) || textFromRich(props["Offer"]),
+      howToApply: textFromRich(props["How to apply"]) || textFromRich(props["How To Apply"]) || textFromRich(props["Application Steps"]),
       offerType: selectName(props["Offer Type"]) ?? textFromRich(props["Offer Type"]),
       valueUsdEst: number(props["Value (USD est.)"]) ?? number(props["Value"]),
-      eligibilitySummary: textFromRich(props["Eligibility Summary"]) ?? textFromRich(props["Eligibility"]),
+      eligibilitySummary: textFromRich(props["Eligibility"]) || textFromRich(props["Eligibility Summary"]),
       requiresReferral: checkbox(props["Requires VC/Accelerator Referral"]) ?? checkbox(props["Requires Referral"]),
       geo: selectName(props["Geo Restrictions"]) ?? textFromRich(props["Geo"]),
       stage,
-      applyUrl: url(props["Apply URL"]) ?? url(props["Application Link"]) ?? url(props["Program URL"]),
-      sourceUrl: url(props["Source URL"]) ?? url(props["Source"]),
-      finalUrl: url(props["Final URL"]) ?? textFromRich(props["Final URL"]),
+      applyUrl: url(props["Apply URL"]) || url(props["Application Link"]) || url(props["Program URL"]),
+      sourceUrl: url(props["Source URL"]) || url(props["Source"]),
+      finalUrl: url(props["Final URL"]) || textFromRich(props["Final URL"]),
       sourceType: selectName(props["Source Type"]) ?? textFromRich(props["Source Type"]),
-      sourceSummary: textFromRich(props["Source Summary"]) ?? textFromRich(props["Summary"]) ?? textFromRich(props["Description"]),
-      autoSummary: textFromRich(props["Auto summary"]) ?? textFromRich(props["Auto Summary"]),
+      sourceSummary: textFromRich(props["Source Summary"]) || textFromRich(props["Summary"]) || textFromRich(props["Description"]),
+      autoSummary: textFromRich(props["Auto summary"]) || textFromRich(props["Auto Summary"]),
       notes: textFromRich(props["Notes"]),
       linkStatus:
         selectName(props["Link Status"]) ??
@@ -300,10 +301,8 @@ export async function getProgram(programId: string): Promise<Program | null> {
       httpStatus: number(props["HTTP Status"]) ?? numberFromRich(props["HTTP Status"]),
       status: statusName(props["Status"]),
       confidence:
-        selectName(props["Extraction confidence"]) ??
-        selectName(props["Confidence"]) ??
-        textFromRich(props["Extraction confidence"]) ??
-        textFromRich(props["Confidence"]),
+        selectName(props["Extraction confidence"]) || textFromRich(props["Extraction confidence"]) ||
+        selectName(props["Confidence"]) || textFromRich(props["Confidence"]),
       lastVerifiedAt: date(props["Last Verified"]) ?? date(props["Last Verified At"]),
       needsReview: checkbox(props["Needs review"]),
     };

@@ -5,10 +5,13 @@ import ProgramCard from "@/components/ProgramCard";
 
 type Program = {
   id: string;
+  programId?: string;
   name: string;
   provider: string;
   category: string[];
   whatYouGet?: string;
+  autoSummary?: string;
+  notes?: string;
   stage?: string[];
   geo?: string;
   valueUsdEst?: number;

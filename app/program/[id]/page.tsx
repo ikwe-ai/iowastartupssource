@@ -1,6 +1,22 @@
 import { getProgram } from "@/lib/notion";
 import Link from "next/link";
 
+function toBullets(text?: string): string[] {
+  if (!text) return [];
+  const normalized = text
+    .replace(/\r/g, "\n")
+    .split(/\n|•|;|(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const unique: string[] = [];
+  for (const item of normalized) {
+    if (unique.some((u) => u.toLowerCase() === item.toLowerCase())) continue;
+    unique.push(item);
+    if (unique.length >= 5) break;
+  }
+  return unique;
+}
+
 export default async function ProgramDetail({ params }: { params: { id: string } }) {
   const p = await getProgram(params.id);
 
@@ -30,6 +46,7 @@ export default async function ProgramDetail({ params }: { params: { id: string }
 
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">{p.name || "Untitled Program"}</h1>
         <div className="mt-1 text-zinc-600">{p.provider}</div>
+        <p className="mt-2 text-xs text-zinc-500">Verified entries only • community suggestions reviewed before publish</p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {p.applyUrl && (
@@ -82,21 +99,33 @@ export default async function ProgramDetail({ params }: { params: { id: string }
       {p.whatYouGet && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
           <div className="font-medium mb-1">What you get</div>
-          <div className="opacity-90">{p.whatYouGet}</div>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-zinc-800">
+            {toBullets(p.whatYouGet).map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
         </div>
       )}
 
       {p.eligibilitySummary && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
-          <div className="font-medium mb-1">Who it's for</div>
-          <div className="opacity-90">{p.eligibilitySummary}</div>
+          <div className="font-medium mb-1">Eligibility</div>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-zinc-800">
+            {toBullets(p.eligibilitySummary).map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
         </div>
       )}
 
       {p.howToApply && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
           <div className="font-medium mb-1">How to apply</div>
-          <div className="opacity-90">{p.howToApply}</div>
+          <ol className="list-decimal pl-5 space-y-1 text-sm text-zinc-800">
+            {toBullets(p.howToApply).map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ol>
         </div>
       )}
 
@@ -123,7 +152,7 @@ export default async function ProgramDetail({ params }: { params: { id: string }
 
       {(p.sourceSummary || p.autoSummary || p.notes) && (
         <div className="rounded-2xl border bg-white/80 p-5 shadow-sm backdrop-blur">
-          <div className="mb-3 text-sm font-medium text-zinc-700">Source notes</div>
+          <div className="mb-3 text-sm font-medium text-zinc-700">Gotchas / Notes</div>
           <div className="grid gap-3 text-sm text-zinc-700">
             {p.sourceSummary && (
               <div>
@@ -153,11 +182,12 @@ export default async function ProgramDetail({ params }: { params: { id: string }
           Found outdated eligibility, value, or links? Send a structured update for review.
         </p>
         <Link
-          href={`/submit?suggestionType=Update%20Existing&relatedProgramId=${encodeURIComponent(p.id)}&title=${encodeURIComponent(p.name || "Program update")}&programUrl=${encodeURIComponent(p.applyUrl || "")}`}
+          href={`/submit?suggestionType=Update%20Existing&relatedProgramId=${encodeURIComponent(p.programId || p.id)}&title=${encodeURIComponent(p.name || "Program update")}&programUrl=${encodeURIComponent(p.applyUrl || "")}`}
           className="inline-flex rounded-full bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-800"
         >
           Open update form
         </Link>
+        {p.programId && <div className="mt-3 text-xs text-zinc-500">Program ID: {p.programId}</div>}
       </div>
     </div>
   );
