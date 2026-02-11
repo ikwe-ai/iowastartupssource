@@ -10,21 +10,21 @@ export default async function Home({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border bg-white/80 backdrop-blur p-8 shadow-sm overflow-hidden relative">
+      <section className="relative overflow-hidden rounded-3xl border bg-white/80 p-5 shadow-sm backdrop-blur sm:p-8">
         <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-gradient-to-br from-indigo-500/20 to-pink-500/10 blur-2xl" />
         <div className="absolute -bottom-28 -left-24 h-64 w-64 rounded-full bg-gradient-to-br from-emerald-500/15 to-indigo-500/10 blur-2xl" />
 
-        <div className="relative space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-xs text-zinc-600">
+        <div className="relative space-y-3 sm:space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-[11px] text-zinc-600 sm:text-xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             updated by community • verified entries only
           </div>
 
-          <h1 className="text-4xl font-semibold tracking-tight">
+          <h1 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
             Iowa’s runway cheat codes.
           </h1>
 
-          <p className="max-w-3xl text-zinc-600 text-lg">
+          <p className="max-w-2xl text-base text-zinc-600 sm:text-lg">
             A living directory of startup credits, perks, accelerators, and non-dilutive programs.
             Built to help founders move faster with less burn.
           </p>
